@@ -1,5 +1,6 @@
-import pygame as pg
 import random
+
+from colors import *
 
 
 class Grid:
@@ -11,25 +12,11 @@ class Grid:
         self.__selection = set()
         self.__full_size = self.__size * self.__cell_size
         self.__remaining_cells = self.__size**2
-        self.__COLORS = {
-            0: (200, 200, 200),  # pozadie siva
-            1: (255, 186, 0),  # zlta
-            2: (182, 47, 47),  # cervena
-            3: (93, 194, 3),  # zelena
-            4: (11, 80, 183)  # modra
-        }
-
-        self.__HIGHLIGHT_COLORS = {
-            1: (255, 207, 77),  # zlta highlight
-            2: (212, 84, 84),  # cervena highlight
-            3: (124, 223, 36),  # zelena highlight
-            4: (36, 101, 198)  # modra highlight
-        }
 
     def draw_grid(self):
         for row in range(self.__size):
             for col in range(self.__size):
-                color = self.__COLORS[self.__grid[row][col]]
+                color = COLORS[self.__grid[row][col]]
                 pg.draw.rect(self.__screen, color,
                              (col * self.__cell_size, row * self.__cell_size, self.__cell_size, self.__cell_size))
                 pg.draw.rect(self.__screen, (0, 0, 0),
@@ -74,7 +61,7 @@ class Grid:
 
     def highlight_selection(self):
         for row, col in self.__selection:
-            color = self.__HIGHLIGHT_COLORS[self.__grid[row][col]]
+            color = HIGHLIGHT_COLORS[self.__grid[row][col]]
             pg.draw.rect(self.__screen, color,
                          (col * self.__cell_size, row * self.__cell_size, self.__cell_size, self.__cell_size))
 

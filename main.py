@@ -1,14 +1,12 @@
-import pygame as pg
 import sys
 
+from colors import *
 from grid import Grid
-
-WIDTH = 800
-HEIGHT = 500
 
 CELL_SIZE = 50
 GRID_SIZE = 10
-BLACK = (0, 0, 0)
+WIDTH = CELL_SIZE * GRID_SIZE + 300
+HEIGHT = CELL_SIZE * GRID_SIZE
 
 
 class Game:
@@ -23,7 +21,9 @@ class Game:
         self.__remaining_cells = self.__font.render(f"Remaining: {self.__grid.get_remaining_cells()}", False, BLACK)
         self.__selected_cells = self.__font.render(f"Selected: {len(self.__grid.get_selection())}", False, BLACK)
 
-    def update(self):
+    def update_screen(self):
+        self.__grid.draw_grid()
+        self.__grid.highlight_selection()
         self.__remaining_cells = self.__font.render(f"Remaining: {self.__grid.get_remaining_cells()}", False, BLACK)
         self.__selected_cells = self.__font.render(f"Selected: {len(self.__grid.get_selection())}", False, BLACK)
         self.__screen.blit(self.__remaining_cells, (520, 250))
@@ -47,10 +47,8 @@ class Game:
                                 else:
                                     self.__grid.clear_selection()
                                     self.__grid.select_block(row, col, self.__grid.get_cell(row, col))
-            self.__screen.fill((255, 255, 255))
-            self.__grid.draw_grid()
-            self.__grid.highlight_selection()
-            self.update()
+            self.__screen.fill(MX_BLUE_GREEN)
+            self.update_screen()
             pg.display.update()
             self.__clock.tick(60)
 
