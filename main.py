@@ -2,6 +2,7 @@ import sys
 
 from colors import *
 from grid import Grid
+from text import Text
 
 CELL_SIZE = 50
 GRID_SIZE = 10
@@ -17,17 +18,14 @@ class Game:
         self.__clock = pg.time.Clock()
         self.__grid = Grid(self.__screen, GRID_SIZE, CELL_SIZE)
         self.__running = True
-        self.__font = pg.font.Font("freesansbold.ttf", 30)
-        self.__remaining_cells = self.__font.render(f"Remaining: {self.__grid.get_remaining_cells()}", False, BLACK)
-        self.__selected_cells = self.__font.render(f"Selected: {len(self.__grid.get_selection())}", False, BLACK)
+        self.__remaining_cells = Text(self.__screen, 600, 200, "Remaining", str(self.__grid.get_remaining_cells()))
+        self.__selected_cells = Text(self.__screen, 600, 300, "Selected", str(len(self.__grid.get_selection())))
 
     def update_screen(self):
         self.__grid.draw_grid()
         self.__grid.highlight_selection()
-        self.__remaining_cells = self.__font.render(f"Remaining: {self.__grid.get_remaining_cells()}", False, BLACK)
-        self.__selected_cells = self.__font.render(f"Selected: {len(self.__grid.get_selection())}", False, BLACK)
-        self.__screen.blit(self.__remaining_cells, (520, 250))
-        self.__screen.blit(self.__selected_cells, (520, 220))
+        self.__remaining_cells.draw(str(self.__grid.get_remaining_cells()))
+        self.__selected_cells.draw(str(len(self.__grid.get_selection())))
 
     def run(self):
         while self.__running:
