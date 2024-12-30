@@ -3,6 +3,7 @@ import sys
 from colors import *
 from grid import Grid
 from text import Text
+from button import Button
 
 CELL_SIZE = 50
 GRID_SIZE = 10
@@ -20,9 +21,12 @@ class Game:
         self.__running = True
         self.__alignment = 550
         self.__score = 0
+
         self.__score_lbl = Text(self.__screen, self.__alignment, 50, "Score", str(self.__score))
         self.__remaining_cells = Text(self.__screen, self.__alignment, 150, "Remaining", str(self.__grid.get_remaining_cells()))
         self.__selected_cells = Text(self.__screen, self.__alignment, 250, "Selected", str(len(self.__grid.get_selection())))
+
+        self.__quit_btn = Button(self.__screen, "QUIT", self.__alignment, 440, 120, 40)
 
     def __update_game(self):
         self.__grid.draw_grid()
@@ -31,6 +35,8 @@ class Game:
         self.__score_lbl.draw(str(self.__score))
         self.__remaining_cells.draw(str(self.__grid.get_remaining_cells()))
         self.__selected_cells.draw(str(len(self.__grid.get_selection())))
+
+        self.__quit_btn.draw_btn()
 
     def __calculate_score(self, count):
         if count < 10:
@@ -44,8 +50,7 @@ class Game:
         while self.__running:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
-                    pg.quit()
-                    sys.exit()
+                    self.__running = False
                 elif event.type == pg.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         x, y = pg.mouse.get_pos()
@@ -59,10 +64,17 @@ class Game:
                                 else:
                                     self.__grid.clear_selection()
                                     self.__grid.select_block(row, col, self.__grid.get_cell(row, col))
+                        else:
+                            if self.__quit_btn.is_clicked(event.pos):
+                                self.__running = False
+                                
             self.__screen.fill(MX_BLUE_GREEN)
             self.__update_game()
             pg.display.update()
             self.__clock.tick(60)
+
+        pg.quit()
+        sys.exit()
 
 
 if __name__ == "__main__":
