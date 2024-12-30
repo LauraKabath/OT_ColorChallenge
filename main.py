@@ -18,12 +18,13 @@ class Game:
         self.__clock = pg.time.Clock()
         self.__grid = Grid(self.__screen, GRID_SIZE, CELL_SIZE)
         self.__running = True
+        self.__alignment = 550
         self.__score = 0
-        self.__score_lbl = Text(self.__screen, 600, 100, "Score", str(self.__score))
-        self.__remaining_cells = Text(self.__screen, 600, 200, "Remaining", str(self.__grid.get_remaining_cells()))
-        self.__selected_cells = Text(self.__screen, 600, 300, "Selected", str(len(self.__grid.get_selection())))
+        self.__score_lbl = Text(self.__screen, self.__alignment, 50, "Score", str(self.__score))
+        self.__remaining_cells = Text(self.__screen, self.__alignment, 150, "Remaining", str(self.__grid.get_remaining_cells()))
+        self.__selected_cells = Text(self.__screen, self.__alignment, 250, "Selected", str(len(self.__grid.get_selection())))
 
-    def update_screen(self):
+    def __update_game(self):
         self.__grid.draw_grid()
         self.__grid.highlight_selection()
 
@@ -31,7 +32,7 @@ class Game:
         self.__remaining_cells.draw(str(self.__grid.get_remaining_cells()))
         self.__selected_cells.draw(str(len(self.__grid.get_selection())))
 
-    def calculate_score(self, count):
+    def __calculate_score(self, count):
         if count < 10:
             self.__score += 15 * count
         elif 10 <= count <= 29:
@@ -53,13 +54,13 @@ class Game:
                         if 0 <= x < self.__grid.get_full_size() and 0 <= y < self.__grid.get_full_size():
                             if self.__grid.get_cell(row, col) != 0:
                                 if (row, col) in self.__grid.get_selection():
-                                    self.calculate_score(len(self.__grid.get_selection()))
+                                    self.__calculate_score(len(self.__grid.get_selection()))
                                     self.__grid.remove_blocks()
                                 else:
                                     self.__grid.clear_selection()
                                     self.__grid.select_block(row, col, self.__grid.get_cell(row, col))
             self.__screen.fill(MX_BLUE_GREEN)
-            self.update_screen()
+            self.__update_game()
             pg.display.update()
             self.__clock.tick(60)
 
