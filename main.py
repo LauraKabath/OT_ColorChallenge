@@ -1,4 +1,5 @@
 import sys
+import random
 
 from colors import *
 from grid import Grid
@@ -46,6 +47,39 @@ class Game:
         elif count >= 30:
             self.__score += 30 * count + 20
 
+    def __draw_menu_background(self):
+        self.__screen.fill(MX_BLUE_GREEN)
+        for row in range(WIDTH):
+            for col in range(HEIGHT):
+                if random.random() > 0.7:
+                    color = COLORS[random.randint(1, 4)]
+                    pg.draw.rect(self.__screen, color, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
+                    pg.draw.rect(self.__screen, BLACK, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 1)
+
+    def start_menu(self):
+        start_button = Button(self.__screen, "START", WIDTH/2 - 50, HEIGHT/2 + 50, 120, 40)
+        title = Text(self.__screen, WIDTH/2 - 50, 140, "Color", "Challenge", 150)
+        title.set_color(WHITE)
+        start = True
+        self.__draw_menu_background()
+
+        while start:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    start = False
+                    self.__running = False
+                elif event.type == pg.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        if start_button.is_clicked(event.pos):
+                            start = False
+                            self.__running = True
+                            self.run()
+
+                title.draw_text()
+                start_button.draw_btn()
+                pg.display.update()
+                self.__clock.tick(60)
+
     def run(self):
         while self.__running:
             for event in pg.event.get():
@@ -67,7 +101,7 @@ class Game:
                         else:
                             if self.__quit_btn.is_clicked(event.pos):
                                 self.__running = False
-                                
+
             self.__screen.fill(MX_BLUE_GREEN)
             self.__update_game()
             pg.display.update()
@@ -79,4 +113,4 @@ class Game:
 
 if __name__ == "__main__":
     game = Game()
-    game.run()
+    game.start_menu()

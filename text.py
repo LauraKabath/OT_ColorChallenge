@@ -23,6 +23,15 @@ class Text:
             centerx=self.__rect.centerx,
             centery=self.__rect.centery - self.__rect.height))
 
+    def draw_text(self):
+        self.__value = self.__font.render(self.__val, True, self.__color)
+        self.__screen.blit(self.__value, self.__value.get_rect(
+            centerx=self.__rect.centerx,
+            centery=self.__rect.centery))
+        self.__screen.blit(self.__label, self.__label.get_rect(
+            centerx=self.__rect.centerx,
+            centery=self.__rect.centery - self.__rect.height))
+
     def set_color(self, color):
         self.__color = color
         self.__render_txt()
