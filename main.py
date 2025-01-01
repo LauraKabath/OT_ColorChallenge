@@ -24,30 +24,41 @@ class Game:
         self.__score = 0
 
         self.__score_lbl = Text(self.__screen, self.__alignment, 50, "Score", str(self.__score))
-        self.__remaining_cells = Text(self.__screen, self.__alignment, 150, "Remaining", str(self.__grid.get_remaining_cells()))
-        self.__selected_cells = Text(self.__screen, self.__alignment, 250, "Selected", str(len(self.__grid.get_selection())))
+        self.__remaining_cells = Text(self.__screen, self.__alignment, 150, "Remaining",
+                                      str(self.__grid.get_remaining_cells()))
+        self.__selected_cells = Text(self.__screen, self.__alignment, 250, "Selected",
+                                     str(self.__grid.get_selection_count()))
 
-        self.__quit_btn = Button(self.__screen, "QUIT", self.__alignment, 440, 120, 40)
+        self.__reset_btn = Button(self.__screen, "RESET", self.__alignment, 320, 120, 40)
+        self.__reset_btn.set_all_colors(ROYAL_ORANGE, MAC_N_CHEESE, BRIGHT_RUSSET)
         self.__color_btn = ColorButton(self.__screen, "DELETE", self.__alignment, 380, 120, 40)
+        self.__quit_btn = Button(self.__screen, "QUIT", self.__alignment, 440, 120, 40)
 
     def __update_game(self):
+        self.__screen.fill(MX_BLUE_GREEN)
         self.__grid.draw_grid()
         self.__grid.highlight_selection()
 
         self.__score_lbl.draw(str(self.__score))
         self.__remaining_cells.draw(str(self.__grid.get_remaining_cells()))
-        self.__selected_cells.draw(str(len(self.__grid.get_selection())))
+        self.__selected_cells.draw(str(self.__grid.get_selection_count()))
 
+        self.__reset_btn.draw_btn()
         self.__quit_btn.draw_btn()
         self.__color_btn.draw_btn()
 
-    def __calculate_score(self, count):
-        if count < 10:
-            self.__score += 15 * count
-        elif 10 <= count <= 29:
-            self.__score += 20 * count + 10
-        elif count >= 30:
-            self.__score += 30 * count + 20
+    def __calculate_score(self, count, used_boost):
+        if used_boost == 0:
+            if count < 10:
+                self.__score += 15 * count
+            elif 10 <= count <= 29:
+                self.__score += 20 * count + 10
+            elif count >= 30:
+                self.__score += 30 * count + 20
+        elif used_boost == 1:
+            self.__score += count
+        elif used_boost == 2:
+            self.__score += 2 * count
 
     def __draw_menu_background(self):
         self.__screen.fill(MX_BLUE_GREEN)
@@ -95,19 +106,28 @@ class Game:
                         if 0 <= x < self.__grid.get_full_size() and 0 <= y < self.__grid.get_full_size():
                             if self.__grid.get_cell(row, col) != 0:
                                 if (row, col) in self.__grid.get_selection():
-                                    self.__calculate_score(len(self.__grid.get_selection()))
+                                    self.__calculate_score(self.__grid.get_selection_count(), 0)
                                     self.__grid.remove_blocks()
                                 else:
                                     self.__grid.clear_selection()
                                     self.__grid.select_block(row, col, self.__grid.get_cell(row, col))
                         else:
+                            if self.__reset_btn.is_clicked(event.pos):
+                                self.__grid.regenerate()
+                                self.__color_btn.reset()
+                                self.__score = 0
+
                             if self.__quit_btn.is_clicked(event.pos):
                                 self.__running = False
+
+                            if self.__color_btn.is_clicked(event.pos):
+                                count = self.__grid.remove_color(self.__color_btn.get_randomness())
+                                self.__calculate_score(count, 1)
+                                self.__color_btn.set_default_colors()
 
             if self.__grid.get_remaining_cells() < 50 and not self.__color_btn.is_active():
                 self.__color_btn.change_color()
 
-            self.__screen.fill(MX_BLUE_GREEN)
             self.__update_game()
             pg.display.update()
             self.__clock.tick(60)

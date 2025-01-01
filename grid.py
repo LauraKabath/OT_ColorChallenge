@@ -65,11 +65,32 @@ class Grid:
             pg.draw.rect(self.__screen, color,
                          (col * self.__cell_size, row * self.__cell_size, self.__cell_size, self.__cell_size))
 
+    def regenerate(self):
+        self.__grid.clear()
+        self.clear_selection()
+        self.__remaining_cells = self.__size**2
+        self.__grid = [[random.randint(1, 4) for i in range(self.__size)] for j in range(self.__size)]
+        self.draw_grid()
+
+    def remove_color(self, color):
+        self.clear_selection()
+        for row in range(self.__size):
+            for col in range(self.__size):
+                if self.__grid[row][col] == color:
+                    self.__selection.add((row, col))
+
+        count = self.get_selection_count()
+        self.remove_blocks()
+        return count
+
     def get_cell(self, row, col):
         return self.__grid[row][col]
 
     def get_selection(self):
         return self.__selection
+
+    def get_selection_count(self):
+        return len(self.__selection)
 
     def get_full_size(self):
         return self.__full_size
