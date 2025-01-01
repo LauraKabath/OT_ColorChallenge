@@ -4,7 +4,7 @@ import random
 from colors import *
 from grid import Grid
 from text import Text
-from button import Button
+from button import Button, ColorButton
 
 CELL_SIZE = 50
 GRID_SIZE = 10
@@ -20,7 +20,7 @@ class Game:
         self.__clock = pg.time.Clock()
         self.__grid = Grid(self.__screen, GRID_SIZE, CELL_SIZE)
         self.__running = True
-        self.__alignment = 550
+        self.__alignment = 590
         self.__score = 0
 
         self.__score_lbl = Text(self.__screen, self.__alignment, 50, "Score", str(self.__score))
@@ -28,6 +28,7 @@ class Game:
         self.__selected_cells = Text(self.__screen, self.__alignment, 250, "Selected", str(len(self.__grid.get_selection())))
 
         self.__quit_btn = Button(self.__screen, "QUIT", self.__alignment, 440, 120, 40)
+        self.__color_btn = ColorButton(self.__screen, "DELETE", self.__alignment, 380, 120, 40)
 
     def __update_game(self):
         self.__grid.draw_grid()
@@ -38,6 +39,7 @@ class Game:
         self.__selected_cells.draw(str(len(self.__grid.get_selection())))
 
         self.__quit_btn.draw_btn()
+        self.__color_btn.draw_btn()
 
     def __calculate_score(self, count):
         if count < 10:
@@ -101,6 +103,9 @@ class Game:
                         else:
                             if self.__quit_btn.is_clicked(event.pos):
                                 self.__running = False
+
+            if self.__grid.get_remaining_cells() < 50 and not self.__color_btn.is_active():
+                self.__color_btn.change_color()
 
             self.__screen.fill(MX_BLUE_GREEN)
             self.__update_game()

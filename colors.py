@@ -2,18 +2,25 @@ import pygame as pg
 from os.path import join
 
 COLORS = {
-    0: (200, 200, 200),  # pozadie siva
-    1: (243, 218, 53),  # zlta
-    2: (191, 48, 48),  # cervena
-    3: (48, 191, 48),  # zelena
-    4: (58, 55, 225)  # modra
+    0: (200, 200, 200),  # gray background
+    1: (243, 218, 53),  # yellow
+    2: (191, 48, 48),  # red
+    3: (48, 191, 48),  # green
+    4: (58, 55, 225)  # blue
 }
 
 HIGHLIGHT_COLORS = {
-    1: (255, 240, 31),  # zlta highlight
-    2: (231, 35, 35),  # cervena highlight
-    3: (36, 240, 36),  # zelena highlight
-    4: (77, 77, 255)  # modra highlight
+    1: (255, 240, 31),  # yellow highlight
+    2: (231, 35, 35),  # red highlight
+    3: (36, 240, 36),  # greed highlight
+    4: (77, 77, 255)  # blue highlight
+}
+
+BORDER_COLORS = {
+    1: (123, 94, 0),  # yellow border
+    2: (96, 24, 24),  # red border
+    3: (24, 96, 24),  # green border
+    4: (29, 28, 113)  # blue border
 }
 
 BLACK = (0, 0, 0)
