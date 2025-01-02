@@ -5,6 +5,7 @@ from colors import *
 from grid import Grid
 from text import Text
 from button import Button, ColorButton
+from boost import Boost
 
 CELL_SIZE = 50
 GRID_SIZE = 10
@@ -34,6 +35,9 @@ class Game:
         self.__color_btn = ColorButton(self.__screen, "DELETE", self.__alignment, 380, 120, 40)
         self.__quit_btn = Button(self.__screen, "QUIT", self.__alignment, 440, 120, 40)
 
+        self.__boosts = [Boost(self.__screen, (730, 340)), Boost(self.__screen, (730, 400))]
+        self.__activated_boost = False
+
     def __update_game(self):
         self.__screen.fill(MX_BLUE_GREEN)
         self.__grid.draw_grid()
@@ -47,6 +51,9 @@ class Game:
         self.__quit_btn.draw_btn()
         self.__color_btn.draw_btn()
 
+        for i in range(len(self.__boosts)):
+            self.__boosts[i].draw_boost()
+
     def __calculate_score(self, count, used_boost):
         if used_boost == 0:
             if count < 10:
@@ -59,6 +66,23 @@ class Game:
             self.__score += count
         elif used_boost == 2:
             self.__score += 2 * count
+
+    def __have_boost(self):
+        for i in range(len(self.__boosts)):
+            if self.__boosts[i].get_state():
+                return True
+        return False
+
+    def __deactivate_boost(self):
+        for i in range(len(self.__boosts)):
+            if self.__boosts[i].get_state():
+                self.__boosts[i].change_state()
+                return
+
+    def __reset_boost(self):
+        for i in range(len(self.__boosts)):
+            if not self.__boosts[i].get_state():
+                self.__boosts[i].change_state()
 
     def __draw_menu_background(self):
         self.__screen.fill(MX_BLUE_GREEN)
@@ -99,11 +123,11 @@ class Game:
                 if event.type == pg.QUIT:
                     self.__running = False
                 elif event.type == pg.MOUSEBUTTONDOWN:
+                    x, y = pg.mouse.get_pos()
+                    col = x // CELL_SIZE
+                    row = y // CELL_SIZE
                     if event.button == 1:
-                        x, y = pg.mouse.get_pos()
-                        col = x // CELL_SIZE
-                        row = y // CELL_SIZE
-                        if 0 <= x < self.__grid.get_full_size() and 0 <= y < self.__grid.get_full_size():
+                        if 0 <= x < self.__grid.get_full_size() and 0 <= y < self.__grid.get_full_size() and not self.__activated_boost:
                             if self.__grid.get_cell(row, col) != 0:
                                 if (row, col) in self.__grid.get_selection():
                                     self.__calculate_score(self.__grid.get_selection_count(), 0)
@@ -115,6 +139,7 @@ class Game:
                             if self.__reset_btn.is_clicked(event.pos):
                                 self.__grid.regenerate()
                                 self.__color_btn.reset()
+                                self.__reset_boost()
                                 self.__score = 0
 
                             if self.__quit_btn.is_clicked(event.pos):
@@ -124,6 +149,17 @@ class Game:
                                 count = self.__grid.remove_color(self.__color_btn.get_randomness())
                                 self.__calculate_score(count, 1)
                                 self.__color_btn.set_default_colors()
+                    elif event.button == 3:
+                        if 0 <= x < self.__grid.get_full_size() and 0 <= y < self.__grid.get_full_size() and self.__have_boost():
+                            if self.__grid.get_cell(row, col) != 0:
+                                if (row, col) in self.__grid.get_selection() and self.__activated_boost:
+                                    self.__calculate_score(self.__grid.get_selection_count(), 2)
+                                    self.__grid.remove_blocks()
+                                    self.__deactivate_boost()
+                                    self.__activated_boost = False
+                                else:
+                                    self.__grid.boost_selection(row, col)
+                                    self.__activated_boost = True
 
             if self.__grid.get_remaining_cells() < 50 and not self.__color_btn.is_active():
                 self.__color_btn.change_color()

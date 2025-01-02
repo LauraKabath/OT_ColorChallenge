@@ -83,6 +83,19 @@ class Grid:
         self.remove_blocks()
         return count
 
+    def boost_selection(self, row, col):
+        self.clear_selection()
+        self.__selection.add((row, col))
+
+        if (row + 1) < self.__size and self.__grid[row + 1][col] != 0:
+            self.__selection.add((row + 1, col))
+        if (row - 1) >= 0 and self.__grid[row - 1][col] != 0:
+            self.__selection.add((row - 1, col))
+        if (col + 1) < self.__size and self.__grid[row][col + 1] != 0:
+            self.__selection.add((row, col + 1))
+        if (col - 1) >= 0 and self.__grid[row][col - 1] != 0:
+            self.__selection.add((row, col - 1))
+
     def get_cell(self, row, col):
         return self.__grid[row][col]
 
