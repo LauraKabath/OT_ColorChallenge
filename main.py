@@ -14,6 +14,12 @@ WIDTH = CELL_SIZE * GRID_SIZE + 300
 HEIGHT = CELL_SIZE * GRID_SIZE
 
 
+class Sound(pg.mixer.Sound):
+    def __init__(self, filename, volume=0.3):
+        super().__init__(join('assets', 'sounds', filename))
+        self.set_volume(volume)
+
+
 class Game:
     def __init__(self):
         pg.init()
@@ -44,6 +50,13 @@ class Game:
 
         self.__player = Player(self.__screen)
         self.__level_lbl = Text(self.__screen, self.__alignment, 150, "Level", str(self.__player.get_level()))
+
+        self.__btn_click_sound = Sound('button_pressed.mp3')
+        self.__block_collapse_sound = Sound('block_collapse.mp3', 0.2)
+        self.__applause_sound = Sound('applause.mp3')
+        self.__click_sound = Sound('click1.mp3')
+        self.__explosion_sound = Sound('explosion.mp3')
+        self.__thunder_sound = Sound('thunder.mp3', 0.5)
 
     def __update_game(self):
         self.__screen.fill(MX_BLUE_GREEN)
@@ -144,6 +157,7 @@ class Game:
                 elif event.type == pg.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         if start_button.is_clicked(event.pos):
+                            self.__btn_click_sound.play()
                             start = False
                             self.__running = True
                             self.run()
@@ -154,6 +168,7 @@ class Game:
                 self.__clock.tick(60)
 
     def __exit_menu(self):
+        self.__applause_sound.play()
         self.__draw_menu_background()
         self.__player.show_scores()
         end = True
@@ -181,30 +196,37 @@ class Game:
                         if 0 <= x < self.__grid.get_full_size() and 0 <= y < self.__grid.get_full_size() and not self.__activated_boost:
                             if self.__grid.get_cell(row, col) != 0:
                                 if (row, col) in self.__grid.get_selection():
+                                    self.__block_collapse_sound.play()
                                     self.__calculate_score(self.__grid.get_selection_count(), 0)
                                     self.__grid.remove_blocks()
                                 else:
+                                    self.__click_sound.play()
                                     self.__grid.clear_selection()
                                     self.__grid.select_block(row, col, self.__grid.get_cell(row, col))
                         else:
                             if self.__reset_btn.is_clicked(event.pos):
+                                self.__btn_click_sound.play()
                                 self.__reset_level()
 
                             if self.__next_btn.is_clicked(event.pos):
+                                self.__btn_click_sound.play()
                                 self.__show_new_level()
 
                             if self.__end_btn.is_clicked(event.pos) or self.__quit_btn.is_clicked(event.pos):
+                                self.__btn_click_sound.play()
                                 self.__running = False
                                 self.__player.add_score(self.__score)
                                 self.__exit_menu()
 
                             if self.__color_btn.is_clicked(event.pos):
+                                self.__btn_click_sound.play()
                                 count = self.__grid.remove_color(self.__color_btn.get_randomness())
                                 self.__calculate_score(count, 1)
                                 self.__color_btn.set_default_colors()
                                 self.__color_btn.mark_used()
 
                             if self.__thunder_btn.is_clicked(event.pos):
+                                self.__thunder_sound.play()
                                 self.__grid.thunder_color(self.__thunder_btn.get_randomness())
                                 self.__thunder_btn.set_default_colors()
                                 self.__thunder_btn.mark_used()
@@ -212,11 +234,13 @@ class Game:
                         if 0 <= x < self.__grid.get_full_size() and 0 <= y < self.__grid.get_full_size() and self.__have_boost():
                             if self.__grid.get_cell(row, col) != 0:
                                 if (row, col) in self.__grid.get_selection() and self.__activated_boost:
+                                    self.__explosion_sound.play()
                                     self.__calculate_score(self.__grid.get_selection_count(), 2)
                                     self.__grid.remove_blocks()
                                     self.__deactivate_boost()
                                     self.__activated_boost = False
                                 else:
+                                    self.__click_sound.play()
                                     self.__grid.boost_selection(row, col)
                                     self.__activated_boost = True
 
