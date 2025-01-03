@@ -150,11 +150,26 @@ class Game:
                 pg.display.update()
                 self.__clock.tick(60)
 
+    def __exit_menu(self):
+        self.__draw_menu_background()
+        self.__player.show_scores()
+        end = True
+        while end:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    end = False
+            pg.display.update()
+            self.__clock.tick(60)
+        pg.quit()
+        sys.exit()
+
     def run(self):
         while self.__running:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.__running = False
+                    pg.quit()
+                    sys.exit()
                 elif event.type == pg.MOUSEBUTTONDOWN:
                     x, y = pg.mouse.get_pos()
                     col = x // CELL_SIZE
@@ -175,12 +190,10 @@ class Game:
                             if self.__next_btn.is_clicked(event.pos):
                                 self.__show_new_level()
 
-                            if self.__end_btn.is_clicked(event.pos):
+                            if self.__end_btn.is_clicked(event.pos) or self.__quit_btn.is_clicked(event.pos):
                                 self.__running = False
                                 self.__player.add_score(self.__score)
-
-                            if self.__quit_btn.is_clicked(event.pos):
-                                self.__running = False
+                                self.__exit_menu()
 
                             if self.__color_btn.is_clicked(event.pos):
                                 count = self.__grid.remove_color(self.__color_btn.get_randomness())
@@ -204,9 +217,6 @@ class Game:
             self.__update_game()
             pg.display.update()
             self.__clock.tick(60)
-
-        pg.quit()
-        sys.exit()
 
 
 if __name__ == "__main__":
