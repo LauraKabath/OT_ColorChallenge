@@ -6,6 +6,7 @@ from grid import Grid
 from text import Text
 from button import Button, ColorButton
 from boost import Boost
+from player import Player
 
 CELL_SIZE = 50
 GRID_SIZE = 10
@@ -25,18 +26,23 @@ class Game:
         self.__score = 0
 
         self.__score_lbl = Text(self.__screen, self.__alignment, 50, "Score", str(self.__score))
-        self.__remaining_cells = Text(self.__screen, self.__alignment, 150, "Remaining",
+        self.__remaining_cells = Text(self.__screen, self.__alignment - 70, 250, "Remaining",
                                       str(self.__grid.get_remaining_cells()))
-        self.__selected_cells = Text(self.__screen, self.__alignment, 250, "Selected",
+        self.__selected_cells = Text(self.__screen, self.__alignment + 70, 250, "Selected",
                                      str(self.__grid.get_selection_count()))
 
         self.__reset_btn = Button(self.__screen, "RESET", self.__alignment, 320, 120, 40)
         self.__reset_btn.set_all_colors(ROYAL_ORANGE, MAC_N_CHEESE, BRIGHT_RUSSET)
+        self.__next_btn = Button(self.__screen, "NEXT LEVEL", self.__alignment - 10, 320, 140, 40)
+        self.__end_btn = Button(self.__screen, "FINISH", self.__alignment, 320, 120, 40)
         self.__color_btn = ColorButton(self.__screen, "DELETE", self.__alignment, 380, 120, 40)
         self.__quit_btn = Button(self.__screen, "QUIT", self.__alignment, 440, 120, 40)
 
         self.__boosts = [Boost(self.__screen, (730, 340)), Boost(self.__screen, (730, 400))]
         self.__activated_boost = False
+
+        self.__player = Player(self.__screen)
+        self.__level_lbl = Text(self.__screen, self.__alignment, 150, "Level", str(self.__player.get_level()))
 
     def __update_game(self):
         self.__screen.fill(MX_BLUE_GREEN)
@@ -44,12 +50,28 @@ class Game:
         self.__grid.highlight_selection()
 
         self.__score_lbl.draw(str(self.__score))
+        self.__level_lbl.draw(str(self.__player.get_level()))
         self.__remaining_cells.draw(str(self.__grid.get_remaining_cells()))
         self.__selected_cells.draw(str(self.__grid.get_selection_count()))
 
         self.__reset_btn.draw_btn()
         self.__quit_btn.draw_btn()
         self.__color_btn.draw_btn()
+
+        self.__reset_btn.deactivate()
+        self.__next_btn.deactivate()
+        self.__end_btn.deactivate()
+
+        if self.__grid.get_remaining_cells() != 0:
+            self.__reset_btn.activate()
+            self.__reset_btn.draw_btn()
+        else:
+            if self.__player.end_level():
+                self.__next_btn.activate()
+                self.__next_btn.draw_btn()
+            else:
+                self.__end_btn.activate()
+                self.__end_btn.draw_btn()
 
         for i in range(len(self.__boosts)):
             self.__boosts[i].draw_boost()
@@ -66,6 +88,17 @@ class Game:
             self.__score += count
         elif used_boost == 2:
             self.__score += 2 * count
+
+    def __reset_level(self):
+        self.__grid.regenerate()
+        self.__color_btn.reset()
+        self.__reset_boost()
+        self.__score = 0
+        self.__activated_boost = False
+
+    def __show_new_level(self):
+        self.__player.add_score(self.__score)
+        self.__reset_level()
 
     def __have_boost(self):
         for i in range(len(self.__boosts)):
@@ -137,10 +170,14 @@ class Game:
                                     self.__grid.select_block(row, col, self.__grid.get_cell(row, col))
                         else:
                             if self.__reset_btn.is_clicked(event.pos):
-                                self.__grid.regenerate()
-                                self.__color_btn.reset()
-                                self.__reset_boost()
-                                self.__score = 0
+                                self.__reset_level()
+
+                            if self.__next_btn.is_clicked(event.pos):
+                                self.__show_new_level()
+
+                            if self.__end_btn.is_clicked(event.pos):
+                                self.__running = False
+                                self.__player.add_score(self.__score)
 
                             if self.__quit_btn.is_clicked(event.pos):
                                 self.__running = False
