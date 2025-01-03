@@ -19,6 +19,9 @@ class Player:
     def get_min_score(self):
         return min(self.__scores)
 
+    def get_sum_scores(self):
+        return sum(self.__scores)
+
     def get_level(self):
         return self.__level
 
@@ -35,14 +38,19 @@ class Player:
 
         for i in range(len(self.__scores)):
             if i < 4:
-                score_text = Text(self.__screen, 50, 140 + i * 100, "Level " + str(i + 1), str(self.__scores[i]))
+                score_text = Text(self.__screen, 70, 150 + i * 100, "Level " + str(i + 1), str(self.__scores[i]))
             elif 4 <= i <= 7:
-                score_text = Text(self.__screen, 250, 140 + (i - 4) * 100, "Level " + str(i + 1), str(self.__scores[i]))
+                score_text = Text(self.__screen, 270, 150 + (i - 4) * 100, "Level " + str(i + 1), str(self.__scores[i]))
 
             else:
-                score_text = Text(self.__screen, 450, 140 + (i - 8) * 100, "Level " + str(i + 1), str(self.__scores[i]))
+                score_text = Text(self.__screen, 470, 150 + (i - 8) * 100, "Level " + str(i + 1), str(self.__scores[i]))
             score_text.draw(str(self.__scores[i]))
-        highscore = Text(self.__screen, 650, 240, "Highscore", str(self.get_max_score()))
-        lowest_score = Text(self.__screen, 650, 340, "Lowest Score", str(self.get_min_score()))
+        highscore = Text(self.__screen, 670, 250, "Highscore", str(self.get_max_score()))
+        lowest_score = Text(self.__screen, 670, 350, "Lowest Score", str(self.get_min_score()))
         highscore.draw(str(self.get_max_score()))
         lowest_score.draw(str(self.get_min_score()))
+
+        total_score = Text(self.__screen, self.__screen.get_width() / 2 - 50, 500, "",
+                           "Your final score is " + str(self.get_sum_scores()), 100)
+        total_score.set_color(WHITE)
+        total_score.draw_text()
