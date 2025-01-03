@@ -8,7 +8,7 @@ class Grid:
         self.__screen = screen
         self.__size = grid_size
         self.__cell_size = cell_size
-        self.__grid = [[random.randint(1, 4) for i in range(self.__size)] for j in range(self.__size)]
+        self.__grid = [[random.randint(1, 4) for _ in range(self.__size)] for _ in range(self.__size)]
         self.__selection = set()
         self.__full_size = self.__size * self.__cell_size
         self.__remaining_cells = self.__size**2
@@ -69,7 +69,7 @@ class Grid:
         self.__grid.clear()
         self.clear_selection()
         self.__remaining_cells = self.__size**2
-        self.__grid = [[random.randint(1, 4) for i in range(self.__size)] for j in range(self.__size)]
+        self.__grid = [[random.randint(1, 4) for _ in range(self.__size)] for _ in range(self.__size)]
         self.draw_grid()
 
     def remove_color(self, color):
@@ -95,6 +95,17 @@ class Grid:
             self.__selection.add((row, col + 1))
         if (col - 1) >= 0 and self.__grid[row][col - 1] != 0:
             self.__selection.add((row, col - 1))
+
+    def thunder_color(self, color):
+        self.clear_selection()
+        row_selection = [random.randint(1, self.__size - 1) for _ in range(self.__size // 2)]
+        col_selection = [random.randint(1, self.__size - 1) for _ in range(2)]
+        for row in row_selection:
+            for col in col_selection:
+                if self.__grid[row][col] != 0 and self.__grid[row][col] != color:
+                    self.__grid[row][col] = color
+
+        self.draw_grid()
 
     def get_cell(self, row, col):
         return self.__grid[row][col]

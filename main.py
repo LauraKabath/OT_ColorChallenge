@@ -9,7 +9,7 @@ from boost import Boost
 from player import Player
 
 CELL_SIZE = 50
-GRID_SIZE = 10
+GRID_SIZE = 12
 WIDTH = CELL_SIZE * GRID_SIZE + 300
 HEIGHT = CELL_SIZE * GRID_SIZE
 
@@ -22,7 +22,7 @@ class Game:
         self.__clock = pg.time.Clock()
         self.__grid = Grid(self.__screen, GRID_SIZE, CELL_SIZE)
         self.__running = True
-        self.__alignment = 590
+        self.__alignment = self.__grid.get_full_size() + 90
         self.__score = 0
 
         self.__score_lbl = Text(self.__screen, self.__alignment, 50, "Score", str(self.__score))
@@ -36,9 +36,10 @@ class Game:
         self.__next_btn = Button(self.__screen, "NEXT LEVEL", self.__alignment - 10, 320, 140, 40)
         self.__end_btn = Button(self.__screen, "FINISH", self.__alignment, 320, 120, 40)
         self.__color_btn = ColorButton(self.__screen, "DELETE", self.__alignment, 380, 120, 40)
-        self.__quit_btn = Button(self.__screen, "QUIT", self.__alignment, 440, 120, 40)
+        self.__thunder_btn = ColorButton(self.__screen, "THUNDER", self.__alignment, 440, 120, 40)
+        self.__quit_btn = Button(self.__screen, "QUIT", self.__alignment, 500, 120, 40)
 
-        self.__boosts = [Boost(self.__screen, (730, 340)), Boost(self.__screen, (730, 400))]
+        self.__boosts = [Boost(self.__screen, (820, 340)), Boost(self.__screen, (820, 400))]
         self.__activated_boost = False
 
         self.__player = Player(self.__screen)
@@ -57,6 +58,7 @@ class Game:
         self.__reset_btn.draw_btn()
         self.__quit_btn.draw_btn()
         self.__color_btn.draw_btn()
+        self.__thunder_btn.draw_btn()
 
         self.__reset_btn.deactivate()
         self.__next_btn.deactivate()
@@ -92,6 +94,7 @@ class Game:
     def __reset_level(self):
         self.__grid.regenerate()
         self.__color_btn.reset()
+        self.__thunder_btn.reset()
         self.__reset_boost()
         self.__score = 0
         self.__activated_boost = False
@@ -200,6 +203,11 @@ class Game:
                                 self.__calculate_score(count, 1)
                                 self.__color_btn.set_default_colors()
                                 self.__color_btn.mark_used()
+
+                            if self.__thunder_btn.is_clicked(event.pos):
+                                self.__grid.thunder_color(self.__thunder_btn.get_randomness())
+                                self.__thunder_btn.set_default_colors()
+                                self.__thunder_btn.mark_used()
                     elif event.button == 3:
                         if 0 <= x < self.__grid.get_full_size() and 0 <= y < self.__grid.get_full_size() and self.__have_boost():
                             if self.__grid.get_cell(row, col) != 0:
@@ -212,8 +220,11 @@ class Game:
                                     self.__grid.boost_selection(row, col)
                                     self.__activated_boost = True
 
-            if self.__grid.get_remaining_cells() < 50 and not self.__color_btn.used():
+            if self.__grid.get_remaining_cells() < 55 and not self.__color_btn.used():
                 self.__color_btn.change_color()
+
+            if self.__grid.get_remaining_cells() < 80 and not self.__thunder_btn.used():
+                self.__thunder_btn.change_color()
 
             self.__update_game()
             pg.display.update()
