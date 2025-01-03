@@ -63,6 +63,7 @@ class ColorButton(Button):
     def __init__(self, screen, name, x, y, width, height):
         super().__init__(screen, name, x, y, width, height)
         self.__randomness = random.randint(1, 4)
+        self.__used = False
         self.deactivate()
         self.set_default_colors()
 
@@ -72,12 +73,19 @@ class ColorButton(Button):
                             BORDER_COLORS[self.__randomness])
 
     def set_default_colors(self):
+        self.deactivate()
         self.set_all_colors(TAUPE_GRAY, SILVER_GRAY, BLACK)
 
     def get_randomness(self):
         return self.__randomness
 
+    def used(self):
+        return self.__used
+
+    def mark_used(self):
+        self.__used = True
+
     def reset(self):
         self.__randomness = random.randint(1, 4)
-        self.deactivate()
         self.set_default_colors()
+        self.__used = False

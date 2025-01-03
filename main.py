@@ -199,6 +199,7 @@ class Game:
                                 count = self.__grid.remove_color(self.__color_btn.get_randomness())
                                 self.__calculate_score(count, 1)
                                 self.__color_btn.set_default_colors()
+                                self.__color_btn.mark_used()
                     elif event.button == 3:
                         if 0 <= x < self.__grid.get_full_size() and 0 <= y < self.__grid.get_full_size() and self.__have_boost():
                             if self.__grid.get_cell(row, col) != 0:
@@ -211,7 +212,7 @@ class Game:
                                     self.__grid.boost_selection(row, col)
                                     self.__activated_boost = True
 
-            if self.__grid.get_remaining_cells() < 50 and not self.__color_btn.is_active():
+            if self.__grid.get_remaining_cells() < 50 and not self.__color_btn.used():
                 self.__color_btn.change_color()
 
             self.__update_game()
