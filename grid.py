@@ -97,6 +97,7 @@ class Grid:
             self.__selection.add((row, col - 1))
 
     def thunder_color(self, color):
+        near = False
         self.clear_selection()
         row_selection = [random.randint(1, self.__size - 1) for _ in range(self.__size // 2)]
         col_selection = [random.randint(1, self.__size - 1) for _ in range(2)]
@@ -104,8 +105,10 @@ class Grid:
             for col in col_selection:
                 if self.__grid[row][col] != 0 and self.__grid[row][col] != color:
                     self.__grid[row][col] = color
+                    near = True
 
         self.draw_grid()
+        return near
 
     def get_cell(self, row, col):
         return self.__grid[row][col]

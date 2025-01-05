@@ -31,7 +31,13 @@ class Player:
     def end_level(self):
         return self.__level < self.__maxLevel
 
+    def __add_unfinished_levels(self):
+        while len(self.__scores) < self.__maxLevel:
+            self.__scores.append(0)
+
     def show_scores(self):
+        if self.__level < self.__maxLevel:
+            self.__add_unfinished_levels()
         scoreboard = Text(self.__screen, self.__screen.get_width() / 2 - 50, 0, "", "Your Scoreboard", 120)
         scoreboard.set_color(WHITE)
         scoreboard.draw_text()

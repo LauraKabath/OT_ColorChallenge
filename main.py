@@ -56,7 +56,8 @@ class Game:
         self.__applause_sound = Sound('applause.mp3')
         self.__click_sound = Sound('click1.mp3')
         self.__explosion_sound = Sound('explosion.mp3')
-        self.__thunder_sound = Sound('thunder.mp3', 0.5)
+        self.__thunder_sound = Sound('thunder.mp3')
+        self.__loud_thunder_sound = Sound('thunder.mp3', 1.5)
 
     def __update_game(self):
         self.__screen.fill(MX_BLUE_GREEN)
@@ -226,8 +227,11 @@ class Game:
                                 self.__color_btn.mark_used()
 
                             if self.__thunder_btn.is_clicked(event.pos):
-                                self.__thunder_sound.play()
-                                self.__grid.thunder_color(self.__thunder_btn.get_randomness())
+                                near = self.__grid.thunder_color(self.__thunder_btn.get_randomness())
+                                if near:
+                                    self.__loud_thunder_sound.play()
+                                else:
+                                    self.__thunder_sound.play()
                                 self.__thunder_btn.set_default_colors()
                                 self.__thunder_btn.mark_used()
                     elif event.button == 3:
