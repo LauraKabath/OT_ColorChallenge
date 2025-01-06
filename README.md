@@ -29,7 +29,7 @@ Tetris Attack je logická hra založená na rýchlom myslení a strategickom pl�
 <p align="center">
   <img src="https://github.com/LauraKabath/OT_ColorChallenge/blob/master/tetris_attack.png" alt="TetrisAttack">
   <br>
-  <em>Obrázok 1 Ukážka hry Tetris Attack</em>
+  <em>Obrázok 2 Ukážka hry Tetris Attack</em>
 </p>
 
 ### **1.2 Herný zážitok**
@@ -47,7 +47,7 @@ Hra poskytuje zábavný a návykový zážitok, ktorý hráča núti strategicky
 ### **2.1 Prehľad hry**
 Hráč používa myš na klikanie skupiny blokov rovnakej farby, aby ich odstránil z hracej plochy.  Počas hry sa postupne odomykajú špeciálne vylepšenia, ktoré mu vedia pomôcť v náročnej situácii.  Hráč musí premýšľať o tom, kedy a akým spôsobom vylepšenia použiť, aby vyčistil hraciu plochu čo najefektívnejšie a dosiahol tým najlepší výsledok.
 
-### **2.2 Interpretácia témy (Swarms - príklad témy)**
+### **2.2 Interpretácia témy (Color as a gameplay feature – farba ako herná mechanika)**
 **„Color as a gameplay feature“** – farba plní hlavnú úlohu mechanizmu interakcie hráča s herným prostredím. Na hracej ploche hráč strategicky odstraňuje bloky rovnakej farby. Po odstránení sa ich miesto automaticky upraví, čím sa vytvára priestor pre ďalšie ťahy. Farba neslúži iba ako vizuálny prvok, ale ako kľúčový nástroj stratégie, ktorý hráč využíva na dosiahnutie svojich herných cieľov a zvládanie čoraz zložitejších výziev.
 
 ### **2.3 Základné mechaniky**
@@ -60,7 +60,41 @@ Hráč používa myš na klikanie skupiny blokov rovnakej farby, aby ich odstrá
 
 ### **2.4 Návrh tried**
 - **Game**: trieda, v ktorej sa nachádza hlavná herná logika (štart menu, exit menu, hlavná herná slučka, výpočet skóre, aktivácia a deaktivácia špeciálnych vylepšení)
--	**Grid**: trieda predstavujúca hraciu plochu, zabezpečuje vykreslenie farebných blokov, označenie vybraných blokov,  odstraňovanie a posúvanie blokov. Taktiež zabezpečuje logiku špeciálnych vylepšení. 
+-	**Grid**: trieda predstavujúca hraciu plochu, zabezpečuje vykreslenie farebných blokov, označenie vybraných blokov,  odstraňovanie a posúvanie blokov. Taktiež zabezpečuje logiku špeciálnych vylepšení.
 -	**Player**: trieda hráča, ktorá uchováva informácie o nadobudnutých bodoch počas hry a na konci zabezpečí ich výpis.
 -	**ColorButton**: trieda špeciálneho tlačidla, zabezpečuje vykreslenie, obsahuje metódy na aktivovanie a deaktivovanie, mení svoju farbu na základe splnenia podmienky a náhody.
 -	**Boost, Button, Text**: triedy zabezpečujúce grafický dizajn hry.
+
+---
+## **3. Grafika**
+
+### **3.1 Interpretácia témy (Color as a gameplay feature – farba ako herná mechanika)**
+V hre sa kladie dôraz na vizuálnu jednoduchosť a príťažlivosť, pričom využíva jasné a živé farby ako základný prvok herného dizajnu. Každá farba má kľúčovú úlohu pri hernej interakcii, pričom dizajn cielene pomáha hráčovi intuitívne pochopiť pravidlá hry a strategické možnosti.  Celkový dizajn hry sa nesie v minimalistickom 2D štýle, ktorý kladie dôraz na kontrast a prehľadnosť.
+
+### **3.2 Dizajn**
+Dizajn hry je tvorený vlastnou grafikou, okrem fontu. Grafické prostredie pozostáva z farebných 2D blokov (obdĺžnikov, štvorcov), ktoré sú hlavnými hernými objektmi. Každý blok je odlíšený svojou farbou (žltá, červená, zelená, modrá). Animácie, ako miznutie blokov či ich preskupovanie, sú plynulé a nenápadné, pričom efektívne zdôrazňujú dynamiku herného prostredia.
+
+<p align="center">
+  <img src="https://github.com/LauraKabath/OT_ColorChallenge/blob/master/grid_level.png" alt="GridLevel">
+  <br>
+  <em>Obrázok 3 Ukážka hracej plochy</em>
+</p>
+
+Herné boosty – špeciálne vylepšenia sú vizuálne znázornené ikonami alebo tlačidlami, napr. bomba pre boost - bomba. Tieto prvky nielen esteticky zapadajú do herného prostredia, ale aj okamžite naznačujú svoju funkciu.
+
+<p align="center">
+  <img src="https://github.com/LauraKabath/OT_ColorChallenge/blob/master/boosts.png" alt="GridLevel">
+  <br>
+  <em>Obrázok 4 Ukážka boostu bomba</em>
+</p>
+
+<p align="center">
+  <img src="https://github.com/LauraKabath/OT_ColorChallenge/blob/master/buttons.png" alt="Buttons">
+  <br>
+  <em>Obrázok 5 Ukážka tlačidiel</em>
+</p>
+
+Ako font v hre bol vybraný asset z itch.io, konkrétne avenue-pixel (https://jdjimenez.itch.io/avenue-pixel), ktorý dolaďuje celkový dizajn hry.
+
+---
+## **4. Zvuk**
