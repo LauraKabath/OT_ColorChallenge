@@ -14,6 +14,7 @@ class Text:
         self.__value = self.__font.render(self.__val, True, self.__color)
 
     def draw(self, value):
+        # draws formatted text and the value in the rectangle
         pg.draw.rect(self.__screen, PALE_BLUE, self.__rect, border_radius=10)
         self.__value = self.__font.render(value, True, self.__color)
         self.__screen.blit(self.__value, self.__value.get_rect(
@@ -24,6 +25,7 @@ class Text:
             centery=self.__rect.centery - self.__rect.height))
 
     def draw_text(self):
+        # draws formatted text and the value without rectangle
         self.__value = self.__font.render(self.__val, True, self.__color)
         self.__screen.blit(self.__value, self.__value.get_rect(
             centerx=self.__rect.centerx,

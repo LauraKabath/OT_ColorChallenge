@@ -36,6 +36,7 @@ class Player:
             self.__scores.append(0)
 
     def show_scores(self):
+        # draws player's scoreboard
         if self.__level < self.__maxLevel:
             self.__add_unfinished_levels()
         scoreboard = Text(self.__screen, self.__screen.get_width() / 2 - 50, 0, "", "Your Scoreboard", 120)

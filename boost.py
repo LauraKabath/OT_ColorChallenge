@@ -6,6 +6,7 @@ class Boost:
         self.__screen = screen
         self.__state = 1  # 0-used 1-active
         self.__size = (size, size)
+        # loading and scaling images for boost
         self.__active_img = pg.transform.scale(pg.image.load(join('assets', 'images', 'black.png')).convert_alpha(),
                                                self.__size)
         self.__used_img = pg.transform.scale(pg.image.load(join('assets', 'images', 'white.png')).convert_alpha(),

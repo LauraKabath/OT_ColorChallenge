@@ -18,6 +18,7 @@ class Button:
 
     def draw_btn(self):
         px, py = pg.mouse.get_pos()
+        # hover effect for button
         if self.__shape.x <= px <= self.__shape.x + self.__shape.width and self.__shape.y <= py <= self.__shape.y + self.__shape.height:
             pg.draw.rect(self.__screen, self.__hoverColor, self.__shape, border_radius=15)
         else:
@@ -43,6 +44,8 @@ class Button:
     def __render_txt(self):
         self.__text = self.__font.render(self.__name, True, self.__txtColor)
 
+    # setters for changing button's colors
+
     def set_btn_color(self, new_color):
         self.__color = new_color
 
@@ -62,12 +65,14 @@ class Button:
 class ColorButton(Button):
     def __init__(self, screen, name, x, y, width, height):
         super().__init__(screen, name, x, y, width, height)
-        self.__randomness = random.randint(1, 4)
+        self.__randomness = random.randint(1, 4)  # random color decision
         self.__used = False
         self.deactivate()
         self.set_default_colors()
 
     def change_color(self):
+        # activates button and changes its color
+        # so the player knows which color will be affected after clicking on the button
         self.activate()
         self.set_all_colors(COLORS[self.__randomness], HIGHLIGHT_COLORS[self.__randomness],
                             BORDER_COLORS[self.__randomness])

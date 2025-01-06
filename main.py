@@ -30,13 +30,13 @@ class Game:
         self.__running = True
         self.__alignment = self.__grid.get_full_size() + 90
         self.__score = 0
-
+        # initialisation of text labels
         self.__score_lbl = Text(self.__screen, self.__alignment, 50, "Score", str(self.__score))
         self.__remaining_cells = Text(self.__screen, self.__alignment - 70, 250, "Remaining",
                                       str(self.__grid.get_remaining_cells()))
         self.__selected_cells = Text(self.__screen, self.__alignment + 70, 250, "Selected",
                                      str(self.__grid.get_selection_count()))
-
+        # initialisation of buttons
         self.__reset_btn = Button(self.__screen, "RESET", self.__alignment, 320, 120, 40)
         self.__reset_btn.set_all_colors(ROYAL_ORANGE, MAC_N_CHEESE, BRIGHT_RUSSET)
         self.__next_btn = Button(self.__screen, "NEXT LEVEL", self.__alignment - 10, 320, 140, 40)
@@ -44,13 +44,13 @@ class Game:
         self.__color_btn = ColorButton(self.__screen, "DELETE", self.__alignment, 380, 120, 40)
         self.__thunder_btn = ColorButton(self.__screen, "THUNDER", self.__alignment, 440, 120, 40)
         self.__quit_btn = Button(self.__screen, "QUIT", self.__alignment, 500, 120, 40)
-
+        # initialisation of boosts
         self.__boosts = [Boost(self.__screen, (820, 340)), Boost(self.__screen, (820, 400))]
         self.__activated_boost = False
-
+        # initialisation of player
         self.__player = Player(self.__screen)
         self.__level_lbl = Text(self.__screen, self.__alignment, 150, "Level", str(self.__player.get_level()))
-
+        # sounds for the game
         self.__btn_click_sound = Sound('button_pressed.mp3')
         self.__block_collapse_sound = Sound('block_collapse.mp3', 0.2)
         self.__applause_sound = Sound('applause.mp3')
@@ -60,32 +60,33 @@ class Game:
         self.__loud_thunder_sound = Sound('thunder.mp3', 1.5)
 
     def __update_game(self):
+        # updates/redraws all the components in game
         self.__screen.fill(MX_BLUE_GREEN)
         self.__grid.draw_grid()
         self.__grid.highlight_selection()
-
+        # labels
         self.__score_lbl.draw(str(self.__score))
         self.__level_lbl.draw(str(self.__player.get_level()))
         self.__remaining_cells.draw(str(self.__grid.get_remaining_cells()))
         self.__selected_cells.draw(str(self.__grid.get_selection_count()))
-
+        # buttons
         self.__reset_btn.draw_btn()
         self.__quit_btn.draw_btn()
         self.__color_btn.draw_btn()
         self.__thunder_btn.draw_btn()
-
+        # deactivation of buttons
         self.__reset_btn.deactivate()
         self.__next_btn.deactivate()
         self.__end_btn.deactivate()
-
-        if self.__grid.get_remaining_cells() != 0:
+        # conditions which determines which button to draw according to the block count
+        if self.__grid.get_remaining_cells() != 0:  # the grid is not cleared = level is not finished
             self.__reset_btn.activate()
             self.__reset_btn.draw_btn()
-        else:
-            if self.__player.end_level():
+        else:  # grid is cleared
+            if self.__player.end_level():  # not in the final level
                 self.__next_btn.activate()
                 self.__next_btn.draw_btn()
-            else:
+            else:  # finished final level
                 self.__end_btn.activate()
                 self.__end_btn.draw_btn()
 
@@ -93,19 +94,21 @@ class Game:
             self.__boosts[i].draw_boost()
 
     def __calculate_score(self, count, used_boost):
-        if used_boost == 0:
+        # calculates score based on count of deleted blocks and condition if boost was used
+        if used_boost == 0:  # boost wasn't used
             if count < 10:
                 self.__score += 15 * count
             elif 10 <= count <= 29:
                 self.__score += 20 * count + 10
             elif count >= 30:
                 self.__score += 30 * count + 20
-        elif used_boost == 1:
+        elif used_boost == 1:  # boost: DELETE color_btn was used
             self.__score += count
-        elif used_boost == 2:
+        elif used_boost == 2:  # boost: Bomb was used
             self.__score += 2 * count
 
     def __reset_level(self):
+        # resets level after clicking on reset_btn
         self.__grid.regenerate()
         self.__color_btn.reset()
         self.__thunder_btn.reset()
@@ -114,36 +117,42 @@ class Game:
         self.__activated_boost = False
 
     def __show_new_level(self):
+        # loads new level after clicking on next_btn
         self.__player.add_score(self.__score)
         self.__reset_level()
 
     def __have_boost(self):
+        # return boolean value if the player / game have boost: bomb
         for i in range(len(self.__boosts)):
             if self.__boosts[i].get_state():
                 return True
         return False
 
     def __deactivate_boost(self):
+        # deactivates boost: bomb when used
         for i in range(len(self.__boosts)):
             if self.__boosts[i].get_state():
                 self.__boosts[i].change_state()
                 return
 
     def __reset_boost(self):
+        # resets boost: bomb for a new level or reset
         for i in range(len(self.__boosts)):
             if not self.__boosts[i].get_state():
                 self.__boosts[i].change_state()
 
     def __draw_menu_background(self):
+        # draws colorful background for start and exit screen
         self.__screen.fill(MX_BLUE_GREEN)
         for row in range(WIDTH):
             for col in range(HEIGHT):
-                if random.random() > 0.7:
+                if random.random() > 0.7:  # random drawing of colorful blocks
                     color = COLORS[random.randint(1, 4)]
                     pg.draw.rect(self.__screen, color, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
                     pg.draw.rect(self.__screen, BLACK, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 1)
 
     def start_menu(self):
+        # displays start screen
         start_button = Button(self.__screen, "START", WIDTH/2 - 50, HEIGHT/2 + 50, 120, 40)
         title = Text(self.__screen, WIDTH/2 - 50, 140, "Color", "Challenge", 150)
         title.set_color(WHITE)
@@ -169,9 +178,10 @@ class Game:
                 self.__clock.tick(60)
 
     def __exit_menu(self):
+        # display exit screen
         self.__applause_sound.play()
         self.__draw_menu_background()
-        self.__player.show_scores()
+        self.__player.show_scores()  # draws player's scoreboard
         end = True
         while end:
             for event in pg.event.get():
@@ -183,6 +193,7 @@ class Game:
         sys.exit()
 
     def run(self):
+        # main game loop
         while self.__running:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
@@ -193,7 +204,7 @@ class Game:
                     x, y = pg.mouse.get_pos()
                     col = x // CELL_SIZE
                     row = y // CELL_SIZE
-                    if event.button == 1:
+                    if event.button == 1:  # left mouse button: grid blocks
                         if 0 <= x < self.__grid.get_full_size() and 0 <= y < self.__grid.get_full_size() and not self.__activated_boost:
                             if self.__grid.get_cell(row, col) != 0:
                                 if (row, col) in self.__grid.get_selection():
@@ -204,7 +215,7 @@ class Game:
                                     self.__click_sound.play()
                                     self.__grid.clear_selection()
                                     self.__grid.select_block(row, col, self.__grid.get_cell(row, col))
-                        else:
+                        else:  # button clicked
                             if self.__reset_btn.is_clicked(event.pos):
                                 self.__btn_click_sound.play()
                                 self.__reset_level()
@@ -234,7 +245,7 @@ class Game:
                                     self.__thunder_sound.play()
                                 self.__thunder_btn.set_default_colors()
                                 self.__thunder_btn.mark_used()
-                    elif event.button == 3:
+                    elif event.button == 3:  # right mouse button: boost bomb
                         if 0 <= x < self.__grid.get_full_size() and 0 <= y < self.__grid.get_full_size() and self.__have_boost():
                             if self.__grid.get_cell(row, col) != 0:
                                 if (row, col) in self.__grid.get_selection() and self.__activated_boost:
@@ -247,7 +258,7 @@ class Game:
                                     self.__click_sound.play()
                                     self.__grid.boost_selection(row, col)
                                     self.__activated_boost = True
-
+            # conditions for color buttons activation
             if self.__grid.get_remaining_cells() < 55 and not self.__color_btn.used():
                 self.__color_btn.change_color()
 
