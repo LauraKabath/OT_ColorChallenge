@@ -98,3 +98,20 @@ Ako font v hre bol vybraný asset z itch.io, konkrétne avenue-pixel (https://jd
 
 ---
 ## **4. Zvuk**
+
+### **4.1 Hudba**
+Aby sa hráč mohol plne sústrediť na riešenie úloh, hudba v pozadí je vynechaná. Namiesto toho sa prirodzenou hudbou do pozadia hry stáva hráčovo strategické klikanie myšou, ktoré vytvára rytmus a dodáva hre osobité tempo. Tento prístup zohľadňuje potrebu hráča sústrediť sa na herné stratégie.
+
+### **4.2 Zvuky**
+Zvuky v hre sú navrhnuté tak, aby zvýraznili dôležité herné udalosti a prispeli k vytvoreniu pohlcujúceho zážitku pre hráča. Každá významná akcia, ako napríklad kliknutie na bloky, ich odstránenie, explózia bomby, použitie tlačidla alebo efekt blesku, je sprevádzaná charakteristickým zvukovým efektom, ktorý okamžite informuje hráča o vykonaní akcie. Po úspešnom dokončení všetkých úrovní hráča odmení potlesk.
+
+---
+## **5. Herný zážitok**
+
+### **5.1 Používateľské rozhranie**
+Používateľné rozhranie ladí s celkovým grafickým štýlom hry. Štartovacia obrazovka obsahuje možnosť spustiť hru a koncová obrazovka predstavuje tabuľku bodov, ktoré hráč nahral s možnosťou ukončiť hru.
+
+### **5.2 Ovládanie**
+<ins>**Myš**</ins> 
+- **Ľavé tlačidlo**: klikanie a odstraňovanie blokov, klikanie na tlačidlá.
+- **Pravé tlačidlo**: aktivácia a použitie boostu - bomba.
