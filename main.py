@@ -38,7 +38,7 @@ class Game:
                                      str(self.__grid.get_selection_count()))
         # initialisation of buttons
         self.__reset_btn = Button(self.__screen, "RESET", self.__alignment, 320, 120, 40)
-        self.__reset_btn.set_all_colors(ROYAL_ORANGE, MAC_N_CHEESE, BRIGHT_RUSSET)
+        self.__reset_btn.set_all_colors(PASTEL_PINK, BABY_PINK, CAPPUCCINO)
         self.__next_btn = Button(self.__screen, "NEXT LEVEL", self.__alignment - 10, 320, 140, 40)
         self.__end_btn = Button(self.__screen, "FINISH", self.__alignment, 320, 120, 40)
         self.__color_btn = ColorButton(self.__screen, "DELETE", self.__alignment, 380, 120, 40)
@@ -110,7 +110,7 @@ class Game:
 
     def __reset_level(self):
         # resets level after clicking on reset_btn
-        self.__grid.regenerate()
+        self.__grid.regenerate(self.__player.get_level())
         self.__color_btn.reset()
         self.__thunder_btn.reset()
         self.__reset_boost()
@@ -234,13 +234,13 @@ class Game:
 
                             if self.__color_btn.is_clicked(event.pos):
                                 self.__btn_click_sound.play()
-                                count = self.__grid.remove_color(self.__color_btn.get_randomness())
+                                count = self.__grid.remove_color(self.__color_btn.get_color())
                                 self.__calculate_score(count, 1)
                                 self.__color_btn.set_default_colors()
                                 self.__color_btn.mark_used()
 
                             if self.__thunder_btn.is_clicked(event.pos):
-                                near = self.__grid.thunder_color(self.__thunder_btn.get_randomness())
+                                near = self.__grid.thunder_charge(self.__thunder_btn.get_color())
                                 if near:
                                     self.__loud_thunder_sound.play()
                                 else:
@@ -260,12 +260,16 @@ class Game:
                                     self.__click_sound.play()
                                     self.__grid.boost_selection(row, col)
                                     self.__activated_boost = True
+
+            if self.__grid.get_thunder():
+                self.__loud_thunder_sound.play()
             # conditions for color buttons activation
+            color_counts = self.__grid.get_color_counts(self.__player.get_level())
             if self.__grid.get_remaining_cells() < 55 and not self.__color_btn.used():
-                self.__color_btn.change_color()
+                self.__color_btn.set_affected_color(color_counts, True)
 
             if self.__grid.get_remaining_cells() < 80 and not self.__thunder_btn.used():
-                self.__thunder_btn.change_color()
+                self.__thunder_btn.set_affected_color(color_counts, False)
 
             self.__update_game(delta)
             pg.display.update()

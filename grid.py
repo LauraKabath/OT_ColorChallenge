@@ -2,6 +2,7 @@ import random
 
 from colors import *
 from cube import GroupGrid, Cube
+from animated_boosts import Thunder
 
 
 class Grid:
@@ -12,6 +13,7 @@ class Grid:
         # groups
         self.__group = GroupGrid()
         self.__cubes_group = pg.sprite.Group()
+        self.__thunders_group = pg.sprite.Group()
         # matrix representing playing area
         self.__grid = [[random.randint(1, 4) for _ in range(self.__size)] for _ in range(self.__size)]
         self.__cubeGrid = [
@@ -23,6 +25,9 @@ class Grid:
         self.__selection = set()  # a set to store positions of selected blocks
         self.__full_size = self.__size * self.__cell_size
         self.__remaining_cells = self.__size**2  # number of cells/blocks in the grid
+        # thunder boost attributes
+        self.__thunder_activated = False
+        self.__thunder_array = []
 
     def draw_grid(self, delta):
         # draws cubes according to generated grid
@@ -33,6 +38,19 @@ class Grid:
                 self.__highlight_selection()
                 if cube:
                     self.__cubeGrid[row][col].draw()
+
+        self.__thunder_activation(delta)
+
+    def __thunder_activation(self, delta):
+        if self.__thunder_activated and len(self.__thunder_array) > 0:
+            for thunder in self.__thunder_array:
+                thunder.draw_thunder(delta)
+            if self.__thunder_array[0].disappear():
+                self.__thunder_activated = False
+                self.__thunder_color(self.__thunder_array[0].get_color())
+                self.__thunder_array.clear()
+        else:
+            self.__thunder_activated = False
 
     def select_block(self, row, col, color):
         # selects block of the same color using recursion
@@ -128,11 +146,11 @@ class Grid:
         for row, col in self.__selection:
             self.__cubeGrid[row][col].select()
 
-    def regenerate(self):
+    def regenerate(self, level):
         self.__grid.clear()
         self.clear_selection()
         self.__remaining_cells = self.__size**2
-        self.__grid = [[random.randint(1, 4) for _ in range(self.__size)] for _ in range(self.__size)]
+        self.__grid = [[random.randint(1, self.__get_range(level)) for _ in range(self.__size)] for _ in range(self.__size)]
         self.__cubeGrid = [
             [Cube(self.__screen, col * self.__cell_size, row * self.__cell_size, self.__cell_size,
                   self.__grid[row][col], (self.__group, self.__cubes_group))
@@ -165,18 +183,49 @@ class Grid:
         if (col - 1) >= 0 and self.__grid[row][col - 1] != 0:
             self.__selection.add((row, col - 1))  # left
 
-    def thunder_color(self, color):
-        near = False
+    def thunder_charge(self, color):
+        near = False  # True - thunder stroked, False - thunder was far away
+        self.__thunder_activated = True
         self.clear_selection()
         # random selection of blocks to change color
-        row_selection = [random.randint(1, self.__size - 1) for _ in range(self.__size // 2)]
-        col_selection = [random.randint(1, self.__size - 1) for _ in range(2)]
+        row_selection = [random.randint(0, self.__size - 1) for _ in range(7)]
+        col_selection = [random.randint(0, self.__size - 1) for _ in range(5)]
         for row in row_selection:
             for col in col_selection:
                 if self.__grid[row][col] != 0 and self.__grid[row][col] != color:
-                    self.__grid[row][col] = color
                     near = True
+                    self.__thunder_array.append(
+                        Thunder(self.__screen, (col * self.__cell_size, row * self.__cell_size), color,
+                                (self.__group, self.__thunders_group)))
         return near
+
+    def __thunder_color(self, color):
+        for thunder in self.__thunder_array:
+            thunder_position = thunder.get_position()
+            row = thunder_position[1] // self.__cell_size
+            col = thunder_position[0] // self.__cell_size
+            if self.__grid[row][col] != 0 and self.__grid[row][col] != color:
+                self.__grid[row][col] = color
+                self.__cubeGrid[row][col].change_color(color)
+
+    def __count_color(self, color):
+        color_count = 0
+        for row in range(self.__size):
+            color_count = len([self.__grid[row][col] for col in range(self.__size) if self.__grid[row][col] == color])
+        return color_count
+
+    def get_color_counts(self, level):
+        color_arr = []
+        for i in range(1, self.__get_range(level) + 1):
+            color_arr.append(self.__count_color(i))
+        return color_arr
+
+    def __get_range(self, level):
+        if 10 >= level > 5:
+            return 5
+        if level > 10:
+            return 6
+        return 4
 
     def get_cell(self, row, col):
         return self.__grid[row][col]
@@ -198,3 +247,11 @@ class Grid:
 
     def clear_selection(self):
         self.__selection.clear()
+        for row in range(self.__size):
+            for col in range(self.__size):
+                cube = self.__cubeGrid[row][col]
+                if cube:
+                    self.__cubeGrid[row][col].unselect()
+
+    def get_thunder(self):
+        return self.__thunder_activated

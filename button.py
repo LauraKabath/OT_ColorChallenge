@@ -1,5 +1,3 @@
-import random
-
 from colors import *
 
 
@@ -65,7 +63,7 @@ class Button:
 class ColorButton(Button):
     def __init__(self, screen, name, x, y, width, height):
         super().__init__(screen, name, x, y, width, height)
-        self.__randomness = random.randint(1, 4)  # random color decision
+        self.__affected_color = 0
         self.__used = False
         self.deactivate()
         self.set_default_colors()
@@ -74,15 +72,44 @@ class ColorButton(Button):
         # activates button and changes its color
         # so the player knows which color will be affected after clicking on the button
         self.activate()
-        self.set_all_colors(COLORS[self.__randomness], HIGHLIGHT_COLORS[self.__randomness],
-                            BORDER_COLORS[self.__randomness])
+        self.set_all_colors(COLORS[self.__affected_color], HIGHLIGHT_COLORS[self.__affected_color],
+                            BORDER_COLORS[self.__affected_color])
 
     def set_default_colors(self):
         self.deactivate()
         self.set_all_colors(TAUPE_GRAY, SILVER_GRAY, BLACK)
 
-    def get_randomness(self):
-        return self.__randomness
+    def get_color(self):
+        return self.__affected_color
+
+    def set_affected_color(self, color_array, condition):
+        if condition:
+            color_num = self.__find_max(color_array)
+        else:
+            color_num = self.__find_min(color_array)
+        self.__affected_color = color_num
+        self.change_color()
+
+    def __find_max(self, color_array):
+        maxi_value = color_array[0]
+        index = 1
+        for i in range(len(color_array)):
+            if color_array[i] > maxi_value:
+                maxi_value = color_array[i]
+                index = i + 1
+        return index
+
+    def __find_min(self, color_array):
+        if max(color_array) == 0:
+            return 1
+        else:
+            min_value = 10
+            index = 0
+            for i in range(len(color_array)):
+                if color_array[i] < min_value and color_array[i] != 0:
+                    min_value = color_array[i]
+                    index = i + 1
+            return index
 
     def used(self):
         return self.__used
@@ -91,6 +118,6 @@ class ColorButton(Button):
         self.__used = True
 
     def reset(self):
-        self.__randomness = random.randint(1, 4)
+        self.__affected_color = 0
         self.set_default_colors()
         self.__used = False
