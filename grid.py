@@ -1,6 +1,7 @@
 import random
 
 from colors import *
+from cube import GroupGrid, Cube
 
 
 class Grid:
@@ -8,21 +9,30 @@ class Grid:
         self.__screen = screen
         self.__size = grid_size
         self.__cell_size = cell_size
+        # groups
+        self.__group = GroupGrid()
+        self.__cubes_group = pg.sprite.Group()
         # matrix representing playing area
         self.__grid = [[random.randint(1, 4) for _ in range(self.__size)] for _ in range(self.__size)]
+        self.__cubeGrid = [
+            [Cube(self.__screen, col * self.__cell_size, row * self.__cell_size, self.__cell_size,
+                  self.__grid[row][col], (self.__group, self.__cubes_group))
+             for col in range(self.__size)]
+            for row in range(self.__size)
+        ]
         self.__selection = set()  # a set to store positions of selected blocks
         self.__full_size = self.__size * self.__cell_size
         self.__remaining_cells = self.__size**2  # number of cells/blocks in the grid
 
-    def draw_grid(self):
-        # draws blocks according to generated grid
+    def draw_grid(self, delta):
+        # draws cubes according to generated grid
+        pg.draw.rect(self.__screen, COLORS[0], (0, 0, self.__full_size, self.__full_size))
         for row in range(self.__size):
             for col in range(self.__size):
-                color = COLORS[self.__grid[row][col]]
-                pg.draw.rect(self.__screen, color,
-                             (col * self.__cell_size, row * self.__cell_size, self.__cell_size, self.__cell_size))
-                pg.draw.rect(self.__screen, (0, 0, 0),
-                             (col * self.__cell_size, row * self.__cell_size, self.__cell_size, self.__cell_size), 1)
+                cube = self.__cubeGrid[row][col]
+                self.__highlight_selection()
+                if cube:
+                    self.__cubeGrid[row][col].draw()
 
     def select_block(self, row, col, color):
         # selects block of the same color using recursion
@@ -32,6 +42,7 @@ class Grid:
             return
 
         self.__selection.add((row, col))
+        self.__cubeGrid[row][col].select()
         # recursion
         self.select_block(row - 1, col, color)  # up
         self.select_block(row + 1, col, color)  # down
@@ -39,43 +50,95 @@ class Grid:
         self.select_block(row, col + 1, color)  # right
         # not allowing selection of a single block
         if len(self.__selection) == 1:
+            self.__cubeGrid[row][col].unselect()
             self.__selection.pop()
 
     def remove_blocks(self):
         # removes all blocks in the selection
         for row, col in self.__selection:
             self.__grid[row][col] = 0
+            self.__cubeGrid[row][col] = None
 
-        for col in range(self.__size):  # shifting blocks down
+        # handle falling blocks column by column
+        for col in range(self.__size):
             column = [self.__grid[row][col] for row in range(self.__size)]
             column = [i for i in column if i != 0]  # removes empty spaces
             column = [0] * (self.__size - len(column)) + column  # adds empty spaces at the top
+            # collects all non-None cubes in the column
+            column_cubes = [self.__cubeGrid[row][col] for row in range(self.__size) if
+                            self.__cubeGrid[row][col] is not None]
+            missing_cubes = self.__size - len(column_cubes)
+
             for row in range(self.__size):  # updates grid
                 self.__grid[row][col] = column[row]
 
-        for col in range(self.__size - 1, -1, -1):  # from right to left
-            if all([self.__grid[row][col] == 0 for row in range(self.__size)]):  # if the column is empty
-                for shift_col in range(col, self.__size - 1):  # shifts empty column to the right
-                    for row in range(self.__size):
-                        self.__grid[row][shift_col] = self.__grid[row][shift_col + 1]
-                for row in range(self.__size): # the rightest column will be emptied
-                    self.__grid[row][self.__size - 1] = 0
+            # shifts existing cubes down
+            for row in range(len(column_cubes)):
+                cube = column_cubes[row]
+                new_row = missing_cubes + row
+                new_y = new_row * self.__cell_size
+                self.__cubeGrid[new_row][col] = cube
+                cube.start_falling(new_y)  # falling animation
 
+            # fills the top of the column with new cubes
+            for row in range(missing_cubes):
+                new_color = 0
+                new_cube = Cube(
+                    self.__screen,
+                    col * self.__cell_size,
+                    row * self.__cell_size,
+                    self.__cell_size,
+                    new_color,
+                    (self.__group, self.__cubes_group)
+                )
+                self.__cubeGrid[row][col] = new_cube
+
+        for s_col in range(self.__size - 1, -1, -1):  # from right to left
+            if all([self.__grid[row][s_col] == 0 for row in range(self.__size)]):  # if the column is empty
+                for shift_col in range(s_col, self.__size - 1):  # shifts empty column to the right
+                    for row in range(self.__size):
+                        x = shift_col * self.__cell_size
+                        self.__grid[row][shift_col] = self.__grid[row][shift_col + 1]
+                        self.__cubeGrid[row][shift_col] = self.__cubeGrid[row][shift_col + 1]
+                        if self.__cubeGrid[row][shift_col] is not None:
+                            self.__cubeGrid[row][shift_col].start_shifting(x)  # shifting animation
+                for row in range(self.__size):  # the rightest column will be emptied
+                    self.__grid[row][self.__size - 1] = 0
+                    self.__cubeGrid[row][self.__size - 1] = None
+
+        # update the score based on the number of removed blocks
         self.update_remaining_cells(len(self.__selection))
         self.clear_selection()
 
-    def highlight_selection(self):
+    def fall(self, delta):  # handles falling of all cubes in grid
+        for row in range(self.__size):
+            for col in range(self.__size):
+                cube = self.__cubeGrid[row][col]
+                if cube:
+                    cube.fall(delta)
+
+    def shift(self, delta):
+        for row in range(self.__size):
+            for col in range(self.__size):
+                cube = self.__cubeGrid[row][col]
+                if cube:
+                    cube.shift(delta)
+
+    def __highlight_selection(self):
         for row, col in self.__selection:
-            color = HIGHLIGHT_COLORS[self.__grid[row][col]]
-            pg.draw.rect(self.__screen, color,
-                         (col * self.__cell_size, row * self.__cell_size, self.__cell_size, self.__cell_size))
+            self.__cubeGrid[row][col].select()
 
     def regenerate(self):
         self.__grid.clear()
         self.clear_selection()
         self.__remaining_cells = self.__size**2
         self.__grid = [[random.randint(1, 4) for _ in range(self.__size)] for _ in range(self.__size)]
-        self.draw_grid()
+        self.__cubeGrid = [
+            [Cube(self.__screen, col * self.__cell_size, row * self.__cell_size, self.__cell_size,
+                  self.__grid[row][col], (self.__group, self.__cubes_group))
+             for col in range(self.__size)]
+            for row in range(self.__size)
+        ]
 
     def remove_color(self, color):
         self.clear_selection()
@@ -113,8 +176,6 @@ class Grid:
                 if self.__grid[row][col] != 0 and self.__grid[row][col] != color:
                     self.__grid[row][col] = color
                     near = True
-
-        self.draw_grid()
         return near
 
     def get_cell(self, row, col):

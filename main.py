@@ -59,11 +59,12 @@ class Game:
         self.__thunder_sound = Sound('thunder.mp3')
         self.__loud_thunder_sound = Sound('thunder.mp3', 1.5)
 
-    def __update_game(self):
-        # updates/redraws all the components in game
+    def __update_game(self, delta):  # updates/redraws all the components in game
         self.__screen.fill(MX_BLUE_GREEN)
-        self.__grid.draw_grid()
-        self.__grid.highlight_selection()
+        # cubes/grid animation
+        self.__grid.fall(delta)
+        self.__grid.shift(delta)
+        self.__grid.draw_grid(delta)
         # labels
         self.__score_lbl.draw(str(self.__score))
         self.__level_lbl.draw(str(self.__player.get_level()))
@@ -175,7 +176,7 @@ class Game:
                 title.draw_text()
                 start_button.draw_btn()
                 pg.display.update()
-                self.__clock.tick(60)
+                self.__clock.tick()
 
     def __exit_menu(self):
         # display exit screen
@@ -188,13 +189,14 @@ class Game:
                 if event.type == pg.QUIT:
                     end = False
             pg.display.update()
-            self.__clock.tick(60)
+            self.__clock.tick()
         pg.quit()
         sys.exit()
 
     def run(self):
         # main game loop
         while self.__running:
+            delta = self.__clock.tick() / 1000
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     self.__running = False
@@ -265,9 +267,8 @@ class Game:
             if self.__grid.get_remaining_cells() < 80 and not self.__thunder_btn.used():
                 self.__thunder_btn.change_color()
 
-            self.__update_game()
+            self.__update_game(delta)
             pg.display.update()
-            self.__clock.tick(60)
 
 
 if __name__ == "__main__":
