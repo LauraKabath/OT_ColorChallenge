@@ -253,7 +253,7 @@ class Game:
                                 if (row, col) in self.__grid.get_selection() and self.__activated_boost:
                                     self.__explosion_sound.play()
                                     self.__calculate_score(self.__grid.get_selection_count(), 2)
-                                    self.__grid.remove_blocks()
+                                    self.__grid.activate_explosion()
                                     self.__deactivate_boost()
                                     self.__activated_boost = False
                                 else:

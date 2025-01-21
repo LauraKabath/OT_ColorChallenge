@@ -2,7 +2,7 @@ import random
 
 from colors import *
 from cube import GroupGrid, Cube
-from animated_boosts import Thunder
+from animated_boosts import Thunder, Boom, Explosion
 
 
 class Grid:
@@ -14,6 +14,8 @@ class Grid:
         self.__group = GroupGrid()
         self.__cubes_group = pg.sprite.Group()
         self.__thunders_group = pg.sprite.Group()
+        self.__booms_group = pg.sprite.Group()
+        self.__explosions_group = pg.sprite.Group()
         # matrix representing playing area
         self.__grid = [[random.randint(1, 4) for _ in range(self.__size)] for _ in range(self.__size)]
         self.__cubeGrid = [
@@ -28,6 +30,10 @@ class Grid:
         # thunder boost attributes
         self.__thunder_activated = False
         self.__thunder_array = []
+        # boom, explosion boost attributes
+        self.__explosion_activated = False
+        self.__explosion_array = []
+        self.__boom_array = []
 
     def draw_grid(self, delta):
         # draws cubes according to generated grid
@@ -39,7 +45,12 @@ class Grid:
                 if cube:
                     self.__cubeGrid[row][col].draw()
 
+        if len(self.__boom_array) != 0:
+            for boom in self.__boom_array:
+                boom.draw_boom(delta)
+
         self.__thunder_activation(delta)
+        self.__explosion_activation(delta)
 
     def __thunder_activation(self, delta):
         if self.__thunder_activated and len(self.__thunder_array) > 0:
@@ -51,6 +62,19 @@ class Grid:
                 self.__thunder_array.clear()
         else:
             self.__thunder_activated = False
+
+    def __explosion_activation(self, delta):
+        if self.__explosion_activated and len(self.__explosion_array) > 0:
+            self.__boom_array = [boom.kill() for boom in self.__boom_array]
+            self.__boom_array.clear()
+            for exp in self.__explosion_array:
+                exp.draw_explosion(delta)
+            if self.__explosion_array[0].get_state() == 8:
+                self.remove_blocks()
+                self.__explosion_activated = False
+                self.__explosion_array.clear()
+        else:
+            self.__explosion_activated = False
 
     def select_block(self, row, col, color):
         # selects block of the same color using recursion
@@ -150,7 +174,8 @@ class Grid:
         self.__grid.clear()
         self.clear_selection()
         self.__remaining_cells = self.__size**2
-        self.__grid = [[random.randint(1, self.__get_range(level)) for _ in range(self.__size)] for _ in range(self.__size)]
+        self.__grid = [[random.randint(1, self.__get_range(level)) for _ in range(self.__size)] for _ in
+                       range(self.__size)]
         self.__cubeGrid = [
             [Cube(self.__screen, col * self.__cell_size, row * self.__cell_size, self.__cell_size,
                   self.__grid[row][col], (self.__group, self.__cubes_group))
@@ -171,17 +196,26 @@ class Grid:
         return count
 
     def boost_selection(self, row, col):
+        # clearing previous selection
         self.clear_selection()
-        self.__selection.add((row, col))
-        # selection when boost-bomb is used
-        if (row + 1) < self.__size and self.__grid[row + 1][col] != 0:
-            self.__selection.add((row + 1, col))  # down
-        if (row - 1) >= 0 and self.__grid[row - 1][col] != 0:
-            self.__selection.add((row - 1, col))  # up
-        if (col + 1) < self.__size and self.__grid[row][col + 1] != 0:
-            self.__selection.add((row, col + 1))  # right
-        if (col - 1) >= 0 and self.__grid[row][col - 1] != 0:
-            self.__selection.add((row, col - 1))  # left
+        self.__boom_array = [boom.kill() for boom in self.__boom_array]
+        self.__boom_array.clear()
+        self.__explosion_array = [exp.kill() for exp in self.__explosion_array]
+        self.__explosion_array.clear()
+        # directions for explosion
+        destinations = [(row, col), (row + 1, col), (row - 1, col), (row, col + 1), (row, col - 1)]
+        for destination in destinations:
+            row = destination[0]
+            col = destination[1]
+            if 0 <= row < self.__size and 0 <= col < self.__size:
+                if self.__grid[row][col] != 0:
+                    self.__selection.add((row, col))
+                    self.__cubeGrid[row][col].select()
+                    self.__boom_array.append(Boom(self.__screen, (col * self.__cell_size, row * self.__cell_size),
+                                                  (self.__group, self.__booms_group)))
+                    self.__explosion_array.append(
+                        Explosion(self.__screen, (col * self.__cell_size, row * self.__cell_size),
+                                  (self.__group, self.__explosions_group)))
 
     def thunder_charge(self, color):
         near = False  # True - thunder stroked, False - thunder was far away
@@ -255,3 +289,9 @@ class Grid:
 
     def get_thunder(self):
         return self.__thunder_activated
+
+    def get_explosion(self):
+        return self.__explosion_activated
+
+    def activate_explosion(self):
+        self.__explosion_activated = True
