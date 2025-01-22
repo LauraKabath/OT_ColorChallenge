@@ -61,11 +61,11 @@ class Thunder(pg.sprite.Sprite):
 
 
 class Boom(pg.sprite.Sprite):
-    def __init__(self, screen, position, groups, size=45):
+    def __init__(self, screen, position, groups, size=50):
         super().__init__(groups)
         self.__screen = screen
         self.__state = 0
-        self.__A_speed = 485
+        self.__A_speed = 610
         self.__size = (size, size)
         # loading and scaling images for boom bomb
         self.__images = [pg.transform.scale(
