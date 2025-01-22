@@ -175,7 +175,7 @@ class Game:
                             self.__start_sound.stop()
                             self.__background.clear()
                             self.run()
-            self.__background.draw_background(delta)
+            self.__background.draw_animated_background(delta)
             title.draw_text()
             start_button.draw_btn()
             pg.display.update()
@@ -183,7 +183,7 @@ class Game:
     def __exit_menu(self):
         # display exit screen
         self.__applause_sound.play()
-        self.__background.static_draw()
+        self.__background.draw_frame()
         self.__player.show_scores()  # draws player's scoreboard
         end = True
         while end:

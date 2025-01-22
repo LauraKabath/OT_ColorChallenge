@@ -21,18 +21,18 @@ class Background:
         self.__A_speed = 100  # animation speed
         self.__max_count = 15  # maximum cubes on screen
 
-    def static_draw(self):
+    def draw_frame(self):
         self.__screen.fill(MX_BLUE_GREEN)
         for row in range(self.__height):
             for col in range(self.__width):
-                if random.random() > 0.7:
+                if row == 0 or col == 0 or row == self.__height - 1 or col == self.__width - 1:
                     color = random.randint(1, 4)
                     cube = Cube(self.__screen, col * self.__cube_size, row * self.__cube_size, self.__cube_size, color,
                                 (self.__group, self.__cubes_group))
                     self.__cubes.append(cube)
         self.__draw_cubes()
 
-    def draw_background(self, delta):
+    def draw_animated_background(self, delta):
         self.__screen.fill(MX_BLUE_GREEN)
         self.__time_next += delta * self.__A_speed
         if self.__time_next >= self.__interval and len(self.__cubes) < self.__max_count:
