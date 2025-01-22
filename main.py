@@ -59,6 +59,8 @@ class Game:
         self.__explosion_sound = Sound('explosion.mp3')
         self.__thunder_sound = Sound('thunder.mp3')
         self.__loud_thunder_sound = Sound('thunder.mp3', 1.5)
+        self.__ticking_sound = Sound('ticking.mp3')
+        self.__start_sound = Sound('arcade.mp3', 1.7)
         # menu background
         self.__background = Background(self.__screen, CELL_SIZE)
 
@@ -119,6 +121,7 @@ class Game:
     def __reset_level(self):
         # resets level after clicking on reset_btn
         self.__grid.regenerate(self.__player.get_level())
+        self.__ticking_sound.stop()
         self.__color_btn.reset()
         self.__thunder_btn.reset()
         self.__reset_boost()
@@ -155,6 +158,7 @@ class Game:
         start_button = Button(self.__screen, "START", WIDTH/2 - 50, HEIGHT/2 + 50, 120, 40)
         title = Text(self.__screen, WIDTH/2 - 50, 140, "Color", "Challenge", 150)
         title.set_color(WHITE)
+        self.__start_sound.play(loops=-1)
         start = True
         while start:
             delta = self.__clock.tick() / 1000
@@ -168,6 +172,7 @@ class Game:
                             self.__btn_click_sound.play()
                             start = False
                             self.__running = True
+                            self.__start_sound.stop()
                             self.__background.clear()
                             self.run()
             self.__background.draw_background(delta)
@@ -199,7 +204,7 @@ class Game:
                     self.__running = False
                     pg.quit()
                     sys.exit()
-                elif event.type == pg.MOUSEBUTTONDOWN:
+                elif event.type == pg.MOUSEBUTTONDOWN and not (self.__grid.get_thunder() or self.__grid.get_explosion()):
                     x, y = pg.mouse.get_pos()
                     col = x // CELL_SIZE
                     row = y // CELL_SIZE
@@ -249,22 +254,22 @@ class Game:
                             if self.__grid.get_cell(row, col) != 0:
                                 if (row, col) in self.__grid.get_selection() and self.__activated_boost:
                                     self.__explosion_sound.play()
+                                    self.__ticking_sound.stop()
                                     self.__calculate_score(self.__grid.get_selection_count(), 2)
                                     self.__grid.activate_explosion()
                                     self.__deactivate_boost()
                                     self.__activated_boost = False
                                 else:
-                                    self.__click_sound.play()
+                                    self.__ticking_sound.play(loops=-1)
                                     self.__grid.boost_selection(row, col)
                                     self.__activated_boost = True
                     elif event.button == 2:  # middle mouse button: deactivate boost: bomb
                         self.__click_sound.play()
+                        self.__ticking_sound.stop()
                         self.__activated_boost = False
                         self.__grid.clear_selection()
                         self.__grid.clear_explosion()
 
-            if self.__grid.get_thunder():
-                self.__loud_thunder_sound.play()
             # conditions for color buttons activation
             color_counts = self.__grid.get_color_counts(self.__player.get_level())
             if self.__grid.get_remaining_cells() < 55 and not self.__color_btn.used():

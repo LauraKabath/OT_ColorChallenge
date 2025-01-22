@@ -174,6 +174,7 @@ class Grid:
     def regenerate(self, level):
         self.__grid.clear()
         self.clear_selection()
+        self.clear_explosion()
         self.__remaining_cells = self.__size**2
         self.__grid = [[random.randint(1, self.__get_range(level)) for _ in range(self.__size)] for _ in
                        range(self.__size)]
