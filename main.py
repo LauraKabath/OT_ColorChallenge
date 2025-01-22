@@ -1,5 +1,4 @@
 import sys
-import random
 
 from colors import *
 from grid import Grid
@@ -7,6 +6,7 @@ from text import Text
 from button import Button, ColorButton
 from boost import Boost
 from player import Player
+from background import Background
 
 CELL_SIZE = 50
 GRID_SIZE = 12
@@ -47,6 +47,7 @@ class Game:
         # initialisation of boosts
         self.__boosts = [Boost(self.__screen, (820, 340)), Boost(self.__screen, (820, 400))]
         self.__activated_boost = False
+        self.__boost_addition = False
         # initialisation of player
         self.__player = Player(self.__screen)
         self.__level_lbl = Text(self.__screen, self.__alignment, 150, "Level", str(self.__player.get_level()))
@@ -58,6 +59,8 @@ class Game:
         self.__explosion_sound = Sound('explosion.mp3')
         self.__thunder_sound = Sound('thunder.mp3')
         self.__loud_thunder_sound = Sound('thunder.mp3', 1.5)
+        # menu background
+        self.__background = Background(self.__screen, CELL_SIZE)
 
     def __update_game(self, delta):  # updates/redraws all the components in game
         self.__screen.fill(MX_BLUE_GREEN)
@@ -90,6 +93,11 @@ class Game:
             else:  # finished final level
                 self.__end_btn.activate()
                 self.__end_btn.draw_btn()
+
+        # condition for adding an extra boost to the game
+        if self.__player.get_level() == 9 and not self.__boost_addition:
+            self.__boosts.append(Boost(self.__screen, (820, 460)))
+            self.__boost_addition = True
 
         for i in range(len(self.__boosts)):
             self.__boosts[i].draw_boost()
@@ -142,25 +150,14 @@ class Game:
             if not self.__boosts[i].get_state():
                 self.__boosts[i].change_state()
 
-    def __draw_menu_background(self):
-        # draws colorful background for start and exit screen
-        self.__screen.fill(MX_BLUE_GREEN)
-        for row in range(WIDTH):
-            for col in range(HEIGHT):
-                if random.random() > 0.7:  # random drawing of colorful blocks
-                    color = COLORS[random.randint(1, 4)]
-                    pg.draw.rect(self.__screen, color, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE))
-                    pg.draw.rect(self.__screen, BLACK, (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE), 1)
-
     def start_menu(self):
         # displays start screen
         start_button = Button(self.__screen, "START", WIDTH/2 - 50, HEIGHT/2 + 50, 120, 40)
         title = Text(self.__screen, WIDTH/2 - 50, 140, "Color", "Challenge", 150)
         title.set_color(WHITE)
         start = True
-        self.__draw_menu_background()
-
         while start:
+            delta = self.__clock.tick() / 1000
             for event in pg.event.get():
                 if event.type == pg.QUIT:
                     start = False
@@ -171,17 +168,17 @@ class Game:
                             self.__btn_click_sound.play()
                             start = False
                             self.__running = True
+                            self.__background.clear()
                             self.run()
-
-                title.draw_text()
-                start_button.draw_btn()
-                pg.display.update()
-                self.__clock.tick()
+            self.__background.draw_background(delta)
+            title.draw_text()
+            start_button.draw_btn()
+            pg.display.update()
 
     def __exit_menu(self):
         # display exit screen
         self.__applause_sound.play()
-        self.__draw_menu_background()
+        self.__background.static_draw()
         self.__player.show_scores()  # draws player's scoreboard
         end = True
         while end:

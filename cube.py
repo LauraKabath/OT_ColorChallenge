@@ -41,6 +41,9 @@ class Cube(pg.sprite.Sprite):
     def resize(self, size):
         self.__size = size
 
+    def set_speed(self, speed):
+        self.__speed = speed
+
     def start_falling(self, target_y):
         self.__target_y = target_y
         self.__falling = True
@@ -70,6 +73,9 @@ class Cube(pg.sprite.Sprite):
             elif self.__x < self.__target_x:
                 self.__x = self.__target_x
                 self.__shifting = False
+
+    def is_off_screen(self):
+        return self.__y >= self.__screen.get_height()
 
     def change_color(self, color):
         self.__color_index = color
