@@ -65,7 +65,8 @@ class Grid:
 
     def __explosion_activation(self, delta):
         if self.__explosion_activated and len(self.__explosion_array) > 0:
-            self.__boom_array = [boom.kill() for boom in self.__boom_array]
+            for boom in self.__boom_array:
+                boom.kill()
             self.__boom_array.clear()
             for exp in self.__explosion_array:
                 exp.draw_explosion(delta)
@@ -198,10 +199,7 @@ class Grid:
     def boost_selection(self, row, col):
         # clearing previous selection
         self.clear_selection()
-        self.__boom_array = [boom.kill() for boom in self.__boom_array]
-        self.__boom_array.clear()
-        self.__explosion_array = [exp.kill() for exp in self.__explosion_array]
-        self.__explosion_array.clear()
+        self.clear_explosion()
         # directions for explosion
         destinations = [(row, col), (row + 1, col), (row - 1, col), (row, col + 1), (row, col - 1)]
         for destination in destinations:
@@ -286,6 +284,15 @@ class Grid:
                 cube = self.__cubeGrid[row][col]
                 if cube:
                     self.__cubeGrid[row][col].unselect()
+
+    def clear_explosion(self):
+        for boom in self.__boom_array:
+            boom.kill()
+        self.__boom_array.clear()
+
+        for exp in self.__explosion_array:
+            exp.kill()
+        self.__explosion_array.clear()
 
     def get_thunder(self):
         return self.__thunder_activated

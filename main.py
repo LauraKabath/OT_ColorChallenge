@@ -257,6 +257,11 @@ class Game:
                                     self.__click_sound.play()
                                     self.__grid.boost_selection(row, col)
                                     self.__activated_boost = True
+                    elif event.button == 2:  # middle mouse button: deactivate boost: bomb
+                        self.__click_sound.play()
+                        self.__activated_boost = False
+                        self.__grid.clear_selection()
+                        self.__grid.clear_explosion()
 
             if self.__grid.get_thunder():
                 self.__loud_thunder_sound.play()
