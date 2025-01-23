@@ -99,6 +99,18 @@ Herné boosty – špeciálne vylepšenia sú vizuálne znázornené ikonami ale
 
 Herné boosty [blesku](https://www.freepik.com/free-vector/realistic-lightnings-collection_16143900.htm#fromView=search&page=1&position=15&uuid=d6e5ff62-8664-428d-9385-ac7143840272&new_detail=true), [bomby](https://www.freepik.com/free-vector/explosion-effect-collection-cartoon-design_4833064.htm#fromView=search&page=1&position=46&uuid=2fd4f348-f89c-4d1f-b7c8-c80bb5f49a13&query=bomb+explosion), [explózie](https://www.freepik.com/free-vector/set-explosion-effect-cartoon-comic-style_11053545.htm#fromView=search&page=1&position=2&uuid=db970cb2-c90c-4e0a-80ab-8d6b6348f437) sú doplnené vizuálnym sprievodom. Assety boli použité z freepik.com.
 
+<p align="center">
+  <img src="https://github.com/LauraKabath/OT_ColorChallenge/blob/master/thunders.png" alt="Thunders">
+  <br>
+  <em>Obrázok 6 Ukážka blesku</em>
+</p>
+
+<p align="center">
+  <img src="https://github.com/LauraKabath/OT_ColorChallenge/blob/master/explosions.png" alt="Explosions">
+  <br>
+  <em>Obrázok 7 Ukážka explózie</em>
+</p>
+
 Ako font v hre bol vybraný asset z itch.io, konkrétne avenue-pixel (https://jdjimenez.itch.io/avenue-pixel), ktorý dolaďuje celkový dizajn hry.
 
 ---
