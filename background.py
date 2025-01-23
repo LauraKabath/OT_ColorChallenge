@@ -32,18 +32,21 @@ class Background:
                     self.__cubes.append(cube)
         self.__draw_cubes()
 
-    def draw_animated_background(self, delta):
+    def draw_animated_background(self, delta, color=0):
         self.__screen.fill(MX_BLUE_GREEN)
         self.__time_next += delta * self.__A_speed
         if self.__time_next >= self.__interval and len(self.__cubes) < self.__max_count:
-            self.__display_cubes()
+            self.__display_cubes(color)
             self.__time_next = 0
         self.__update_cubes(delta)
 
-    def __display_cubes(self):
+    def __display_cubes(self, specific_color):
         row = random.randint(0, self.__height // 2)
         col = random.randint(0, self.__width - 1)
-        color = random.randint(1, 4)
+        if specific_color != 0:
+            color = specific_color
+        else:
+            color = random.randint(1, 6)
         cube = Cube(self.__screen, col * self.__cube_size, row * self.__cube_size, self.__cube_size, color,
                     (self.__group, self.__cubes_group))
         cube.set_speed(random.randint(250, 450))  # random speed for dynamics

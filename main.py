@@ -61,6 +61,7 @@ class Game:
         self.__loud_thunder_sound = Sound('thunder.mp3', 1.5)
         self.__ticking_sound = Sound('ticking.mp3')
         self.__start_sound = Sound('arcade.mp3', 1.7)
+        self.__success_sound = Sound('success.mp3')
         # menu background
         self.__background = Background(self.__screen, CELL_SIZE)
 
@@ -180,6 +181,32 @@ class Game:
             start_button.draw_btn()
             pg.display.update()
 
+    def color_menu(self, color):
+        continue_button = Button(self.__screen, "CONTINUE", WIDTH/2 - 50, HEIGHT/2 + 50, 120, 40)
+        message = Text(self.__screen, WIDTH / 2 - 50, 140, "CONGRATULATIONS!", "You unlocked a new color!", 100)
+        message.set_color(WHITE)
+        self.__success_sound.play(loops=-1)
+        menu = True
+        while menu:
+            delta = self.__clock.tick() / 1000
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    menu = False
+                    self.__running = False
+                elif event.type == pg.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        if continue_button.is_clicked(event.pos):
+                            self.__btn_click_sound.play()
+                            menu = False
+                            self.__success_sound.stop()
+                            self.__running = True
+                            self.__background.clear()
+                            self.run()
+            self.__background.draw_animated_background(delta, color)
+            message.draw_text()
+            continue_button.draw_btn()
+            pg.display.update()
+
     def __exit_menu(self):
         # display exit screen
         self.__applause_sound.play()
@@ -227,6 +254,13 @@ class Game:
                             if self.__next_btn.is_clicked(event.pos):
                                 self.__btn_click_sound.play()
                                 self.__show_new_level()
+                                if self.__player.get_level() == 6 or self.__player.get_level() == 10:
+                                    self.__running = False
+                                    if self.__player.get_level() == 6:
+                                        color = 5
+                                    else:
+                                        color = 6
+                                    self.color_menu(color)
 
                             if self.__end_btn.is_clicked(event.pos) or self.__quit_btn.is_clicked(event.pos):
                                 self.__btn_click_sound.play()
