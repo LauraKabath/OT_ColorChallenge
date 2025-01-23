@@ -39,7 +39,8 @@ Hra poskytuje zábavný a návykový zážitok, ktorý hráča núti strategicky
 - **Pygame-CE**: zvolený programovací jazyk,
 -	**PyCharm 2023.3.4**: vybrané IDE,
 -	**Pixabay.com**: zdroj zvukov do hry,
--	**Itch.io**: zdroj fontov do hry.
+-	**Itch.io**: zdroj fontov do hry,
+-	**Freepik.com**: zdroj grafických assetov do hry.
 
 ---
 ## **2. Koncept**
@@ -53,17 +54,19 @@ Hráč používa myš na klikanie skupiny blokov rovnakej farby, aby ich odstrá
 ### **2.3 Základné mechaniky**
 -	**Odstraňovanie blokov**: hlavná mechanika spočíva v klikaní a odstraňovaní skupín blokov rovnakej farby z hracej plochy.
 -	**Posúvanie blokov**: po odstránení blokov sa zvyšné bloky posúvajú nadol, v prípade odstránenia stĺpca sa bloky posunú aj doľava.
--	**Thunder Button**: po stlačení tlačidla sa náhodne vybrané polia blokov zmenia sa stanovenú farbu, čo umožní vytváranie nových väčších skupín blokov s cieľom získať vyšší bodový zisk. Tlačidlo sa aktivuje ak je v hracom poli menej ako 80 blokov.
+-	**Thunder Button**: po stlačení tlačidla sa náhodne vybrané polia blokov zmenia sa stanovenú farbu, čo umožní vytváranie nových väčších skupín blokov s cieľom získať vyšší bodový zisk. Úspešnosť blesku indikuje intenzita zvuku po spustení tlačidla. Tlačidlo sa aktivuje ak je v hracom poli menej ako 80 blokov.
 -	**Boost Bomba**: odstráni bloky v dosahu jedného štvorca v štyroch smeroch, čím výrazne upraví rozloženie hracej plochy.
--	**Delete Button**: po stlačení tlačidla sa odstránia bloky jednej konkrétnej farby, farba je generovaná náhodne, čo hráčovi poskytne možnosť rýchlejšie vyčistiť hraciu plochu. Tlačidlo sa aktivuje ak je v hracom poli menej ako 55 blokov.
+-	**Delete Button**: po stlačení tlačidla sa odstránia bloky jednej konkrétnej farby, farba je generovaná na základe počtu kociek na hracej ploche, čo hráčovi poskytne možnosť rýchlejšie vyčistiť hraciu plochu. Tlačidlo sa aktivuje ak je v hracom poli menej ako 55 blokov.
 -	**Skóre a odmeny**: hráč je odmeňovaný bodmi za úspešné odstránenie blokov. Za väčšie skupiny odstránených blokov získa hráč viac bodov. Ak hráč použije špeciálne vylepšenie (Thunder Button, Boost Bomba, Delete Button) získané skóre bude podstatne nižšie.
 
 ### **2.4 Návrh tried**
 - **Game**: trieda, v ktorej sa nachádza hlavná herná logika (štart menu, exit menu, hlavná herná slučka, výpočet skóre, aktivácia a deaktivácia špeciálnych vylepšení)
--	**Grid**: trieda predstavujúca hraciu plochu, zabezpečuje vykreslenie farebných blokov, označenie vybraných blokov,  odstraňovanie a posúvanie blokov. Taktiež zabezpečuje logiku špeciálnych vylepšení.
+-	**Grid**: trieda predstavujúca hraciu plochu, zabezpečuje vykreslenie farebných blokov, označenie vybraných blokov, odstraňovanie a posúvanie blokov. Taktiež zabezpečuje logiku špeciálnych vylepšení.
+-	**Cube**: trieda predstavujúca sprite farebného bloku. Zabezpečuje padanie a posunutie bloku.
 -	**Player**: trieda hráča, ktorá uchováva informácie o nadobudnutých bodoch počas hry a na konci zabezpečí ich výpis.
 -	**ColorButton**: trieda špeciálneho tlačidla, zabezpečuje vykreslenie, obsahuje metódy na aktivovanie a deaktivovanie, mení svoju farbu na základe splnenia podmienky a náhody.
--	**Boost, Button, Text**: triedy zabezpečujúce grafický dizajn hry.
+-	**Thunder, Explosion, Boom**: triedy predstavujúce animované sprity v hre.
+-	**Boost, Button, Text, Background**: triedy zabezpečujúce grafický dizajn hry.
 
 ---
 ## **3. Grafika**
@@ -72,7 +75,7 @@ Hráč používa myš na klikanie skupiny blokov rovnakej farby, aby ich odstrá
 V hre sa kladie dôraz na vizuálnu jednoduchosť a príťažlivosť, pričom využíva jasné a živé farby ako základný prvok herného dizajnu. Každá farba má kľúčovú úlohu pri hernej interakcii, pričom dizajn cielene pomáha hráčovi intuitívne pochopiť pravidlá hry a strategické možnosti.  Celkový dizajn hry sa nesie v minimalistickom 2D štýle, ktorý kladie dôraz na kontrast a prehľadnosť.
 
 ### **3.2 Dizajn**
-Dizajn hry je tvorený vlastnou grafikou, okrem fontu. Grafické prostredie pozostáva z farebných 2D blokov (obdĺžnikov, štvorcov), ktoré sú hlavnými hernými objektmi. Každý blok je odlíšený svojou farbou (žltá, červená, zelená, modrá). Animácie, ako miznutie blokov či ich preskupovanie, sú plynulé a nenápadné, pričom efektívne zdôrazňujú dynamiku herného prostredia.
+Dizajn hry je tvorený voľne dostupnými assetmi z (https://www.freepik.com/), vlastnou grafikou a fontom. Grafické prostredie pozostáva z farebných 2D blokov (obdĺžnikov, štvorcov), ktoré sú hlavnými hernými objektmi. Každý blok je odlíšený svojou farbou (žltá, červená, zelená, modrá, fialová, oranžová). Animácie, ako miznutie blokov či ich preskupovanie, sú plynulé a nenápadné, pričom efektívne zdôrazňujú dynamiku herného prostredia.
 
 <p align="center">
   <img src="https://github.com/LauraKabath/OT_ColorChallenge/blob/master/grid_level.png" alt="GridLevel">
@@ -93,6 +96,8 @@ Herné boosty – špeciálne vylepšenia sú vizuálne znázornené ikonami ale
   <br>
   <em>Obrázok 5 Ukážka tlačidiel</em>
 </p>
+
+Herné boosty [blesku](https://www.freepik.com/free-vector/realistic-lightnings-collection_16143900.htm#fromView=search&page=1&position=15&uuid=d6e5ff62-8664-428d-9385-ac7143840272&new_detail=true), [bomby](https://www.freepik.com/free-vector/explosion-effect-collection-cartoon-design_4833064.htm#fromView=search&page=1&position=46&uuid=2fd4f348-f89c-4d1f-b7c8-c80bb5f49a13&query=bomb+explosion), [explózie](https://www.freepik.com/free-vector/set-explosion-effect-cartoon-comic-style_11053545.htm#fromView=search&page=1&position=2&uuid=db970cb2-c90c-4e0a-80ab-8d6b6348f437) sú doplnené vizuálnym sprievodom. Assety boli použité z freepik.com.
 
 Ako font v hre bol vybraný asset z itch.io, konkrétne avenue-pixel (https://jdjimenez.itch.io/avenue-pixel), ktorý dolaďuje celkový dizajn hry.
 
@@ -115,3 +120,4 @@ Používateľné rozhranie ladí s celkovým grafickým štýlom hry. Štartovac
 <ins>**Myš**</ins> 
 - **Ľavé tlačidlo**: klikanie a odstraňovanie blokov, klikanie na tlačidlá.
 - **Pravé tlačidlo**: aktivácia a použitie boostu - bomba.
+- **Stlačenie kolieska myši**: deaktivácia boostu - bomba.
