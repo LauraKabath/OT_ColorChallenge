@@ -176,7 +176,7 @@ class Grid:
         self.clear_selection()
         self.clear_explosion()
         self.__remaining_cells = self.__size**2
-        self.__grid = [[random.randint(1, self.__get_range(level)) for _ in range(self.__size)] for _ in
+        self.__grid = [[self.__color_weight(level) for _ in range(self.__size)] for _ in
                        range(self.__size)]
         self.__cubeGrid = [
             [Cube(self.__screen, col * self.__cell_size, row * self.__cell_size, self.__cell_size,
@@ -184,6 +184,21 @@ class Grid:
              for col in range(self.__size)]
             for row in range(self.__size)
         ]
+
+    def __color_weight(self, level):
+        if level <= 5:
+            weights = [1, 1, 1, 1]
+        elif 6 <= level <= 7:
+            weights = [1, 1, 1, 1, 0.5]
+        elif 8 <= level <= 9:
+            weights = [1, 1, 1, 1, 0.7]
+        elif 10 <= level <= 11:
+            weights = [1, 1, 1, 1, 0.8, 0.5]
+        else:
+            weights = [1, 1, 1, 1, 0.7, 0.3]
+
+        colors = list(range(1, len(weights) + 1))
+        return random.choices(colors, weights=weights)[0]
 
     def remove_color(self, color):
         self.clear_selection()
@@ -248,17 +263,16 @@ class Grid:
         return color_count
 
     def get_color_counts(self, level):
+        if level <= 5:
+            range_end = 4
+        elif 6 <= level <= 9:
+            range_end = 5
+        else:
+            range_end = 6
         color_arr = []
-        for i in range(1, self.__get_range(level) + 1):
+        for i in range(1, range_end + 1):
             color_arr.append(self.__count_color(i))
         return color_arr
-
-    def __get_range(self, level):
-        if 10 >= level > 5:
-            return 5
-        if level > 10:
-            return 6
-        return 4
 
     def get_cell(self, row, col):
         return self.__grid[row][col]
